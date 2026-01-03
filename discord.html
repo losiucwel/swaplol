@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Logowanie Discord</title>
+</head>
+
+<body>
+
+    <script src="/api-client.js"></script>
+    <script>
+        const clientId = "1446967520677335313";
+        const clientSecret = "Ab9w1TdGZkapchi2ndAy17oBjw-mGCxw";
+        const redirect = "https://swaplol.com/discord.html";
+
+        async function exchangeCodeForToken(code) {
+            const params = new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                grant_type: "authorization_code",
+                code: code,
+                redirect_uri: redirect
+            });
+
+            const res = await fetch("https://discord.com/api/oauth2/token", {
+                method: "POST",
+                body: params,
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            });
+
+            return res.json();
+        }
+
+        async function getDiscordUser(token) {
+            const res = await fetch("https://discord.com/api/users/@me", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            return res.json();
+        }
+
+        (async () => {
+            try {
+                const code = new URLSearchParams(window.location.search).get("code");
+                if (!code) {
+                    // Brak kodu - przekieruj do logowania
+                    window.location.href = "/login/";
+                    return;
+                }
+
+                const tokenData = await exchangeCodeForToken(code);
+                console.log(tokenData);
+
+
+                const discordUser = await getDiscordUser(tokenData.access_token);
+                if (!discordUser.id || !discordUser.username) throw new Error("Nieprawidłowe dane użytkownika Discorda");
+
+                await db.register(discordUser.username, discordUser.id, "DISCORD_AUTH");
+
+                const loginResult = await db.login(discordUser.id, "DISCORD_AUTH");
+
+                if (loginResult.success) {
+                    console.log("Zalogowano użytkownika:", loginResult.user);
+
+                    const profile = await db.getProfile(loginResult.user.id);
+                    if (profile && profile.slug && profile.slug !== profile.username) {
+                        window.location.href = "/przekierowanie/";
+                    } else if (profile && profile.slug) {
+                        window.location.href = "/przekierowanie/";
+                    } else {
+                        window.location.href = "/setup.html";
+                    }
+                } else {
+                    alert("Błąd logowania: " + loginResult.message);
+                }
+
+            } catch (err) {
+                console.error(err);
+                document.body.innerHTML = "<h1>Wystąpił błąd: " + err.message + "</h1>";
+            }
+        })();
+    </script>
+
+</body>
+
+</html>

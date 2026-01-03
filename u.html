@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - Panel</title>
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'surface-hover': '#121212',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'primary': '#FFFFFF',
+                        'secondary': '#A1A1AA',
+                        'accent': '#FFFFFF',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', 'sans-serif';
+        }
+
+        .preview-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #click-overlay {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.5s ease;
+        }
+
+        .click-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .profile-content {
+            text-align: center;
+            z-index: 10;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 1s ease;
+            border-radius: 24px;
+            /* Added based on previous design, looks better */
+        }
+
+        .username-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.5rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .bio-display {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .rich-presence-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 0 auto 2rem;
+            max-width: 400px;
+            text-align: left;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .rp-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .rp-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .rp-status-dot {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: #71717a;
+            /* Default offline */
+            border: 3px solid #18181b;
+            border-radius: 50%;
+        }
+
+        .rp-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+        }
+
+        .rp-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .rp-details {
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            margin-top: 2px;
+        }
+
+        .social-dock {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: white;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
+
+        .social-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .corner-control {
+            position: absolute;
+            z-index: 20;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 10px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .top-left {
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+        }
+
+        .bottom-left {
+            bottom: 20px;
+            left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="preview-container" class="preview-container">
+        <div id="click-overlay" onclick="enterProfile()">
+            <div class="click-text">kliknij, aby wejść...</div>
+        </div>
+
+        <div class="corner-control top-left" id="volume-control" onclick="toggleMute()" style="display: none;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z">
+                </path>
+            </svg>
+        </div>
+
+        <div class="profile-content" id="profile-content">
+            <h1 id="username" class="username-display"></h1>
+            <p id="bio" class="bio-display"></p>
+
+            <div class="rich-presence-card" id="rp-card">
+                <div class="rp-avatar">
+                    <img id="rp-avatar-img" src="" alt="Avatar">
+                    <div class="rp-status-dot"></div>
+                </div>
+                <div class="rp-info">
+                    <h3>
+                        <span id="rp-username"></span>
+                        <span class="rp-badge" id="rp-badge" style="display: none;"></span>
+                    </h3>
+                    <div class="rp-details" id="rp-status-text">
+                        Ładowanie statusu...
+                    </div>
+                </div>
+            </div>
+
+            <div id="social-dock" class="social-dock">
+            </div>
+        </div>
+
+        <div class="corner-control bottom-left">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                </path>
+            </svg>
+            <span id="view-counter">0</span>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        window.enterProfile = function () {
+            const overlay = document.getElementById('click-overlay');
+            const content = document.getElementById('profile-content');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    content.style.opacity = '1';
+                }, 500);
+            }
+
+            if (window.profileAudio) {
+                window.profileAudio.play().catch(e => console.log("Odtwarzanie dźwięku nie powiodło się:", e));
+            }
+        };
+
+        window.toggleMute = function () {
+            if (window.profileAudio) {
+                window.profileAudio.muted = !window.profileAudio.muted;
+            }
+        };
+
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.getElementById('click-overlay');
+            if (overlay && overlay.style.display !== 'none') {
+                window.enterProfile();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            let slug = urlParams.get('u');
+
+            if (!slug) {
+                // Support for /username URL structure
+                const path = window.location.pathname;
+                const segments = path.split('/').filter(s => s && s !== 'u.html');
+                if (segments.length > 0) {
+                    slug = segments[segments.length - 1];
+                }
+            }
+
+            if (!slug) {
+                document.body.innerHTML = '<div class="text-white text-center mt-20 font-sans">Profil nie znaleziony.</div>';
+                return;
+            }
+
+            const profile = await db.getProfileBySlug(slug);
+
+            if (!profile) {
+                document.body.innerHTML = '<div class="text-white text-center mt-20 font-sans">Profil nie znaleziony.</div>';
+                return;
+            }
+
+            // Static UI Username
+            const usernameEl = document.getElementById('username');
+            usernameEl.textContent = profile.username;
+
+            const targetUsername = "@" + profile.username;
+
+            if (profile.username_effect === 'glitch') {
+                usernameEl.style.animation = 'pulse 0.2s infinite';
+            }
+
+            // Animated Tab Title Only
+            let currentIdx = 0;
+            let isDeleting = false;
+
+            function typeTitle() {
+                const fullText = targetUsername;
+
+                if (!isDeleting && currentIdx <= fullText.length) {
+                    const typedText = fullText.substring(0, currentIdx);
+                    document.title = typedText || "@";
+                    currentIdx++;
+                    setTimeout(typeTitle, 400);
+                } else if (isDeleting && currentIdx >= 0) {
+                    const typedText = fullText.substring(0, currentIdx);
+                    document.title = typedText || "@";
+                    currentIdx--;
+                    setTimeout(typeTitle, 400);
+                } else if (currentIdx > fullText.length) {
+                    isDeleting = true;
+                    setTimeout(typeTitle, 3000);
+                } else {
+                    isDeleting = false;
+                    currentIdx = 0;
+                    setTimeout(typeTitle, 500);
+                }
+            }
+            typeTitle();
+
+            document.getElementById('rp-username').textContent = profile.username;
+            document.getElementById('bio').textContent = profile.bio || '';
+
+            const avatarUrl = profile.avatar || 'https://via.placeholder.com/150';
+            document.getElementById('rp-avatar-img').src = avatarUrl; // Assuming rp-avatar-img ID is kept
+
+            // Background
+            if (profile.background) {
+                document.getElementById('preview-container').style.backgroundImage = `url('${profile.background}')`;
+            }
+
+            // Styling: Opacity & Blur
+            const contentBox = document.getElementById('profile-content');
+            if (profile.opacity) {
+                const alpha = parseInt(profile.opacity) / 100;
+                contentBox.style.background = `rgba(0, 0, 0, ${alpha})`;
+            }
+            if (profile.blur) {
+                contentBox.style.backdropFilter = `blur(${profile.blur}px)`;
+            }
+
+            // Accent Color
+            if (profile.accent_color) {
+                document.getElementById('rp-card').style.borderColor = profile.accent_color;
+            }
+
+            // Premium: Font
+            if (profile.font_family) {
+                document.body.style.fontFamily = profile.font_family;
+                // Ensure headings use it too if not overridden
+                const headings = document.querySelectorAll('h1, h2, h3');
+                headings.forEach(h => h.style.fontFamily = profile.font_family);
+            }
+
+            // Premium: Card Glow
+            if (profile.card_glow_color && profile.card_glow_color !== '#000000') {
+                document.getElementById('rp-card').style.boxShadow = `0 8px 32px rgba(0,0,0,0.3), 0 0 20px ${profile.card_glow_color}`;
+            }
+
+            // Premium: 3D Tilt
+            if (profile.card_tilt == 1) {
+                const card = document.getElementById('rp-card');
+                card.style.transition = 'transform 0.1s ease';
+                document.addEventListener('mousemove', (e) => {
+                    const xAxis = (window.innerWidth / 2 - e.pageX) / 40;
+                    const yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+                    card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+            }
+
+            // Premium: Custom Badge
+            if (profile.badge_text) {
+                const badgeEl = document.getElementById('rp-badge');
+                if (badgeEl) {
+                    badgeEl.textContent = profile.badge_text;
+                    badgeEl.style.display = 'inline-block';
+                }
+            }
+
+            // Username Effects
+            if (profile.username_effect === 'glow') {
+                usernameEl.style.textShadow = `0 0 20px ${profile.accent_color || 'white'}`;
+            } else if (profile.username_effect === 'glitch') {
+                usernameEl.style.animation = 'pulse 0.2s infinite';
+            } else if (profile.username_effect === 'rainbow') {
+                usernameEl.style.backgroundImage = 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)';
+                usernameEl.style.webkitBackgroundClip = 'text';
+                usernameEl.style.color = 'transparent';
+            }
+
+            // Audio
+            if (profile.audio) {
+                const audio = new Audio(profile.audio);
+                audio.loop = true;
+                audio.volume = 0.5;
+                window.profileAudio = audio;
+                document.getElementById('volume-control').style.display = 'flex';
+            }
+
+            // Cursor
+            if (profile.custom_cursor) {
+                document.body.style.cursor = `url('${profile.custom_cursor}'), auto`;
+            }
+
+            // Views Increment
+            if (db.incrementViews) {
+                const views = await db.incrementViews(profile.user_id || profile.id);
+                const counterEl = document.getElementById('view-counter');
+                if (counterEl) counterEl.textContent = views;
+            }
+
+            // Discord Status Logic
+            // Get references to status elements
+            const statusDot = document.querySelector('.rp-status-dot');
+            const statusElement = document.getElementById('rp-status-text');
+
+            // Rotation messages for when no Discord activity
+            const rotationMessages = [
+                'Dostępny',
+                'Aktywny',
+                'Online',
+                'W grze',
+                'Zajęty'
+            ];
+            let rotationIndex = 0;
+            let rotationInterval = null;
+
+            function startRotation() {
+                if (rotationInterval) return;
+                rotationInterval = setInterval(() => {
+                    if (statusElement) {
+                        statusElement.innerHTML = rotationMessages[rotationIndex];
+                        rotationIndex = (rotationIndex + 1) % rotationMessages.length;
+                    }
+                }, 3000);
+            }
+
+            if (profile.discord_id) {
+                const lanyardWs = new WebSocket('wss://api.lanyard.rest/socket');
+
+                lanyardWs.onopen = () => {
+                    lanyardWs.send(JSON.stringify({
+                        op: 2,
+                        d: { subscribe_to_id: profile.discord_id }
+                    }));
+                };
+
+                lanyardWs.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    const { t, d } = data;
+
+                    if (t === 'INIT_STATE' || t === 'PRESENCE_UPDATE') {
+                        const user = d;
+                        const discordStatus = user.discord_status;
+
+                        const colors = {
+                            online: '#22c55e',
+                            idle: '#eab308',
+                            dnd: '#ef4444',
+                            offline: '#71717a'
+                        };
+                        if (statusDot) statusDot.style.background = colors[discordStatus] || colors.offline;
+
+                        let statusText = '';
+
+                        if (user.activities && user.activities.length > 0) {
+                            const game = user.activities.find(a => a.type === 0);
+                            const spotify = user.activities.find(a => a.id === 'spotify:1');
+                            const custom = user.activities.find(a => a.type === 4);
+
+                            if (game) {
+                                statusText = `Gra w <b>${game.name}</b>`;
+                                if (game.details) statusText += `<br><span class="text-xs">${game.details}</span>`;
+                                if (game.state) statusText += `<br><span class="text-xs">${game.state}</span>`;
+                            } else if (spotify) {
+                                statusText = `Słucha <b>${spotify.details}</b><br><span class="text-xs">od ${spotify.state}</span>`;
+                            } else if (custom && custom.state) {
+                                statusText = custom.state;
+                            }
+                        }
+
+                        if (statusText) {
+                            if (rotationInterval) clearInterval(rotationInterval);
+                            statusElement.innerHTML = statusText;
+                            statusElement.style.opacity = '1';
+                        } else {
+                            if (discordStatus === 'offline') {
+                                if (rotationInterval) clearInterval(rotationInterval);
+                                statusElement.innerHTML = 'Offline';
+                                statusElement.style.opacity = '1';
+                            } else {
+                                if (!rotationInterval) startRotation();
+                            }
+                        }
+                    }
+                };
+
+                lanyardWs.onerror = (err) => {
+                    console.error("Lanyard Error:", err);
+                    startRotation();
+                };
+            } else {
+                startRotation();
+            }
+
+            // Social Links
+            const socialDock = document.getElementById('social-dock');
+            socialDock.innerHTML = ''; // Clear existing
+            if (profile.links && profile.links.length) {
+                profile.links.forEach(link => {
+                    // Default Icon
+                    let svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>';
+
+                    if (link.title.toLowerCase().includes('youtube')) {
+                        svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>';
+                    } else if (link.title.toLowerCase().includes('discord')) {
+                        svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>';
+                    } else if (link.title.toLowerCase().includes('instagram')) {
+                        svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z" /></svg>';
+                    }
+
+                    const linkEl = document.createElement('a');
+                    linkEl.href = link.url;
+                    linkEl.target = '_blank';
+                    linkEl.className = 'social-icon';
+                    linkEl.title = link.title;
+                    linkEl.innerHTML = svgIcon;
+
+                    linkEl.addEventListener('click', () => {
+                        if (db.incrementLinkClicks) {
+                            db.incrementLinkClicks(profile.id);
+                        }
+                    });
+
+                    socialDock.appendChild(linkEl);
+                });
+            }
+        });
+
+
+    </script>
+</body>
+
+</html>

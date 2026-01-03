@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Panel</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'surface-hover': '#121212',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'primary': '#FFFFFF',
+                        'secondary': '#A1A1AA',
+                        'accent': '#FFFFFF',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: #FFFFFF;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            outline: none;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: #FFFFFF;
+            color: #000000;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: #E5E5E5;
+            transform: translateY(-1px);
+        }
+
+        .tab-button {
+            color: #A1A1AA;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-button.active {
+            color: #FFFFFF;
+            border-bottom-color: #FFFFFF;
+        }
+
+        .tab-button:hover:not(.active) {
+            color: #E4E4E7;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/[0.02] blur-[120px] rounded-full pointer-events-none">
+    </div>
+
+    <div class="w-full max-w-md relative z-10 animate-fade-in">
+        <div class="text-center mb-8">
+            <a href="/" class="inline-block mb-2">
+                <img src="/logo.png" alt="Logo" class="h-12 mx-auto">
+            </a>
+            <p class="text-secondary">Witaj ponownie</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8">
+            <div class="flex border-b border-white/10 mb-8">
+                <button id="login-tab" class="tab-button active flex-1 pb-4 text-sm font-medium">Zaloguj się</button>
+                <button id="register-tab" class="tab-button flex-1 pb-4 text-sm font-medium">Utwórz konto</button>
+            </div>
+
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label for="login-email" class="block text-sm font-medium text-secondary mb-2">Email lub Nazwa
+                        użytkownika</label>
+                    <input type="text" id="login-email" class="form-input w-full px-4 py-3 rounded-lg text-sm"
+                        placeholder="john@example.com" required>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label for="login-password" class="block text-sm font-medium text-secondary">Hasło</label>
+                        <a href="#" class="text-xs text-secondary hover:text-white transition-colors">Nie pamiętasz
+                            hasła?</a>
+                    </div>
+                    <input type="password" id="login-password" class="form-input w-full px-4 py-3 rounded-lg text-sm"
+                        placeholder="••••••••" required>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="remember-me" 
+                        class="w-4 h-4 rounded border-white/20 bg-transparent text-white focus:ring-0 focus:ring-offset-0">
+                    <label for="remember-me" class="text-sm text-secondary">Zapamiętaj mnie</label>
+                    <button type="button" id="clear-remembered" class="ml-auto text-xs text-secondary hover:text-red-500 transition-colors hidden">
+                        Wyczyść
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-3 rounded-lg text-sm mt-2">
+                    Zaloguj się
+                </button>
+            </form>
+
+            <form id="register-form" class="space-y-5 hidden">
+                <div>
+                    <label for="register-username" class="block text-sm font-medium text-secondary mb-2">Nazwa
+                        użytkownika</label>
+                    <input type="text" id="register-username" class="form-input w-full px-4 py-3 rounded-lg text-sm"
+                        placeholder="johndoe" required>
+                </div>
+
+                <div>
+                    <label for="register-email" class="block text-sm font-medium text-secondary mb-2">Email</label>
+                    <input type="email" id="register-email" class="form-input w-full px-4 py-3 rounded-lg text-sm"
+                        placeholder="john@example.com" required>
+                </div>
+
+                <div>
+                    <label for="register-password" class="block text-sm font-medium text-secondary mb-2">Hasło</label>
+                    <input type="password" id="register-password" class="form-input w-full px-4 py-3 rounded-lg text-sm"
+                        placeholder="••••••••" required>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <input type="checkbox" id="terms"
+                        class="mt-1 bg-transparent border-white/20 rounded focus:ring-0 focus:ring-offset-0" required>
+                    <label for="terms" class="text-xs text-secondary leading-relaxed">
+                        Zgadzam się z <a href="terms.html" class="text-white hover:underline">Warunkami Usługi</a> i <a href="privacy.html"
+                            class="text-white hover:underline">Polityką Prywatności</a>.
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-3 rounded-lg text-sm mt-2">
+                    Utwórz konto
+                </button>
+            </form>
+
+            <div class="mt-8 pt-8 border-t border-white/10">
+                <p class="text-xs text-center text-secondary mb-4 uppercase tracking-wider">Lub kontynuuj przez</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="google-signin-button" onclick="handleGoogleSignIn()"
+                        class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-sm font-medium text-white">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                fill="#4285F4" />
+                            <path
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                fill="#34A853" />
+                            <path
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                fill="#FBBC05" />
+                            <path
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                fill="#EA4335" />
+                        </svg>
+                        Google
+                    </button>
+                    <button onclick="loginWithDiscord()"
+                        class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-sm font-medium text-white">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
+                        </svg>
+                        Discord
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-secondary mt-8">
+            &copy; 2026 Swap.lol. Wszelkie prawa zastrzeżone.
+        </p>
+    </div>
+
+    <script src="/api-client.js"></script>
+    <script src="/main.js"></script>
+
+    <script>
+        // Initialize Google Sign-In (without rendering button)
+        function initializeGoogleSignIn() {
+            if (typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.initialize({
+                    client_id: '69358891217-isjh4tprud00mt0ntlj9239vd17qbhpu.apps.googleusercontent.com',
+                    callback: handleGoogleCallback
+                });
+            }
+        }
+
+        // Trigger Google Sign-In popup when button is clicked
+        function handleGoogleSignIn() {
+            if (typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.prompt();
+            } else {
+                alert('Google Sign-In nie jest jeszcze gotowe, spróbuj ponownie za chwilę.');
+            }
+        }
+
+        // Handle Google OAuth callback
+        async function handleGoogleCallback(response) {
+            try {
+                const result = await fetch('/api/auth/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        credential: response.credential
+                    })
+                });
+
+                const data = await result.json();
+                
+                if (data.success) {
+                    // Store auth token
+                    localStorage.setItem('authToken', data.token);
+                    await handleLoginSuccess(data.user);
+                } else {
+                    alert(data.message || 'Google login failed');
+                }
+            } catch (error) {
+                console.error('Google login error:', error);
+                alert('Wystąpił błąd podczas logowania przez Google');
+            }
+        }
+
+        // Load Google Sign-In when page loads
+        window.addEventListener('load', () => {
+            if (typeof google !== 'undefined') {
+                initializeGoogleSignIn();
+            } else {
+                // Retry after a short delay if Google SDK not loaded yet
+                setTimeout(initializeGoogleSignIn, 500);
+            }
+        });
+
+        // Sprawdź czy użytkownik jest już zalogowany
+        const currentUser = db.getCurrentUser();
+        if (currentUser) {
+            // Użytkownik jest zalogowany, przekieruj do dashboardu
+            window.location.href = '/dashboard/';
+        }
+
+        // Załaduj zapamiętany login jeśli istnieje
+        const rememberedEmail = localStorage.getItem('remembered_email');
+        const rememberCheckbox = document.getElementById('remember-me');
+        const loginEmailInput = document.getElementById('login-email');
+        const clearButton = document.getElementById('clear-remembered');
+        
+        if (rememberedEmail) {
+            loginEmailInput.value = rememberedEmail;
+            rememberCheckbox.checked = true;
+            clearButton.classList.remove('hidden');
+        }
+
+        // Obsługa przycisku "Wyczyść"
+        clearButton.addEventListener('click', () => {
+            localStorage.removeItem('remembered_email');
+            loginEmailInput.value = '';
+            rememberCheckbox.checked = false;
+            clearButton.classList.add('hidden');
+        });
+
+        function loginWithDiscord() {
+            const clientId = "1446967520677335313";
+            const redirect = encodeURIComponent("https://swaplol.com/discord.html");
+
+            const scope = encodeURIComponent("identify email");
+
+            const url = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirect}&response_type=code&scope=${scope}`;
+
+            window.location.href = url;
+        }
+
+        async function handleLoginSuccess(user) {
+            const profile = await db.getProfile(user.id);
+            if (profile && profile.slug) {
+                window.location.href = '/dashboard/';
+            } else {
+                window.location.href = '/setup.html';
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+
+            const result = await db.login(email, password);
+            if (result.success) {
+                // Zapamiętaj lub usuń email w zależności od checkboxa
+                if (rememberMe) {
+                    localStorage.setItem('remembered_email', email);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+                
+                await handleLoginSuccess(result.user);
+            } else {
+                alert(result.message || 'Błąd logowania');
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+
+            const result = await db.register(username, email, password);
+            if (result.success) {
+                window.location.href = '/setup.html';
+            } else {
+                alert(result.message || 'Błąd rejestracji');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel - Panel</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="/api-client.js"></script>
+    <script>
+        try {
+            db.requireAuth();
+        } catch (e) {
+            window.location.replace('/login/');
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'surface-hover': '#121212',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'primary': '#FFFFFF',
+                        'secondary': '#A1A1AA',
+                        'accent': '#FFFFFF',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #A1A1AA;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: #FFFFFF;
+        }
+
+        .sidebar-item.active {
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        /* Logout button specific styles */
+        #logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        /* Logout Modal */
+        #logout-modal {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #logout-modal:not(.hidden) {
+            opacity: 1;
+        }
+
+        #logout-modal .glass-card {
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        #logout-modal:not(.hidden) .glass-card {
+            transform: scale(1);
+        }
+
+        /* Shop Category Buttons */
+        .shop-category-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #A1A1AA;
+            transition: all 0.2s ease;
+        }
+
+        .shop-category-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+
+        .shop-category-btn.active {
+            background: #FFFFFF;
+            color: #000000;
+            border-color: #FFFFFF;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 3px;
+        }
+
+        /* Notification Toast */
+        .notification-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999;
+            min-width: 320px;
+            max-width: 420px;
+        }
+
+        .notification-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification-toast.success {
+            border-left: 3px solid #10b981;
+        }
+
+        .notification-toast.error {
+            border-left: 3px solid #ef4444;
+        }
+
+        .notification-toast.info {
+            border-left: 3px solid #3b82f6;
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .notification-close {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            color: #A1A1AA;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .notification-close:hover {
+            color: #ffffff;
+        }
+
+        /* Confirmation Modal */
+        .confirm-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .confirm-modal-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .confirm-modal {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .confirm-modal-overlay.show .confirm-modal {
+            transform: scale(1);
+        }
+
+        .confirm-modal-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+            color: #ef4444;
+        }
+
+        .confirm-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .confirm-modal-message {
+            font-size: 14px;
+            color: #A1A1AA;
+            text-align: center;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .confirm-modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .confirm-modal-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+        }
+
+        .confirm-modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .confirm-modal-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .confirm-modal-btn-delete {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .confirm-modal-btn-delete:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+    <div class="flex pt-16 min-h-screen">
+        <div
+            class="sidebar w-64 p-6 fixed left-0 top-16 h-full overflow-y-auto border-r border-white/5 bg-surface/50 backdrop-blur-xl z-40 hidden md:block">
+            <div class="p-8 mb-6">
+                <a href="/" class="inline-block mb-2">
+                    <img src="/logo.png" alt="Logo" class="h-8">
+                </a>
+            </div>
+            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+                <div class="sidebar-item active" data-section="overview">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                        </path>
+                    </svg>
+                    Przegląd
+                </div>
+                <a href="/profiles" class="sidebar-item" data-section="profiles">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                        </path>
+                    </svg>
+                    Dostosuj
+                </a>
+                <div class="sidebar-item" data-section="analytics">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                        </path>
+                    </svg>
+                    Analityka
+                </div>
+                <div class="sidebar-item" data-section="files">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Pliki
+                </div>
+                <div class="sidebar-item" data-section="settings">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Ustawienia
+                </div>
+                <div class="sidebar-item" data-section="shop">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    Sklep
+                </div>
+                <a href="/adm" id="admin-nav-item" class="sidebar-item hidden"
+                    style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; padding-top: 8px;">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
+                    </svg>
+                    <span class="flex items-center gap-2">
+                        Admin Panel
+                    </span>
+                </a>
+                
+                <!-- Przycisk Wyloguj się -->
+                <button id="logout-btn" class="sidebar-item w-full text-left mt-auto"
+                    style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 16px; padding-top: 16px; color: #ef4444;">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                        </path>
+                    </svg>
+                    Wyloguj się
+                </button>
+            </nav>
+        </div>
+    </div>
+    </aside>
+
+    <div class="flex-1 ml-64 md:ml-72 p-8 md:p-12 overflow-y-auto bg-background">
+        <div class="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-surface">
+            <a href="/" class="text-lg font-display font-bold text-white">Panel</a>
+            <button class="text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 md:p-10 max-w-7xl mx-auto">
+
+            <div id="overview-section" class="section-content animate-fade-in">
+                <header class="mb-8">
+                    <h1 class="text-2xl md:text-3xl font-display font-bold mb-2">Panel</h1>
+                    <p class="text-secondary">Oto co dzieje się dzisiaj z Twoimi linkami.</p>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card">
+                        <p class="text-sm text-secondary mb-1">Całkowite Wyświetlenia</p>
+                        <p class="text-2xl font-bold text-white" id="stat-views">0</p>
+                        <div class="flex items-center gap-1 mt-2 text-xs" id="stat-views-growth-container">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            <span id="stat-views-growth">+0% od zeszłego tygodnia</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <p class="text-sm text-secondary mb-1">Kliknięcia w Linki</p>
+                        <p class="text-2xl font-bold text-white" id="stat-clicks">0</p>
+                        <div class="flex items-center gap-1 mt-2 text-xs" id="stat-clicks-growth-container">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            <span id="stat-clicks-growth">+0% od zeszłego tygodnia</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <p class="text-sm text-secondary mb-1">Aktywne Profile</p>
+                        <p class="text-2xl font-bold text-white" id="stat-profiles">1</p>
+                        <div class="flex items-center gap-1 mt-2 text-xs text-secondary">
+                            <span>Pozostało 2 miejsca</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <p class="text-sm text-secondary mb-1">Użyte Miejsce</p>
+                        <p class="text-2xl font-bold text-white" id="stat-storage">0 KB</p>
+                        <div class="flex items-center gap-1 mt-2 text-xs text-secondary">
+                            <span id="stat-storage-limit">z limitu 5 GB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="glass-card p-6 rounded-xl">
+                        <h3 class="text-lg font-semibold mb-6">Wyświetlenia w Czasie</h3>
+                        <canvas id="viewsChart" height="250"></canvas>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl">
+                        <h3 class="text-lg font-semibold mb-6">Źródła Ruchu</h3>
+                        <canvas id="sourcesChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <div class="p-6 border-b border-white/5">
+                        <h3 class="text-lg font-semibold">Ostatnia Aktywność</h3>
+                    </div>
+                    <div class="divide-y divide-white/5" id="recent-activity-list">
+                        <div class="p-8 text-center text-sm text-secondary">
+                            Brak nowej aktywności.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profiles-section" class="section-content hidden animate-fade-in">
+                <header class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-display font-bold mb-2">Moje Linki</h1>
+                        <p class="text-secondary">Zarządzaj linkami na swojej stronie profilowej.</p>
+                    </div>
+                    <button id="btn-add-link"
+                        class="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        Dodaj Nowy Link
+                    </button>
+                </header>
+
+                <div id="dashboard-link-list" class="space-y-4">
+                </div>
+
+                <div id="link-modal"
+                    class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+                    <div class="glass-card w-full max-w-md p-6 rounded-xl m-4">
+                        <h3 class="text-xl font-bold mb-4" id="modal-title">Dodaj Nowy Link</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-secondary mb-1">Tytuł</label>
+                                <input type="text" id="link-title-input"
+                                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white/30"
+                                    placeholder="np. YouTube">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-secondary mb-1">URL</label>
+                                <input type="text" id="link-url-input"
+                                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white/30"
+                                    placeholder="https://...">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-secondary mb-1">URL Ikony (Opcjonalne)</label>
+                                <input type="text" id="link-icon-input"
+                                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white/30"
+                                    placeholder="https://...">
+                                <p class="text-[10px] text-secondary mt-1">Pozostaw puste dla automatycznego wykrywania
+                                    na podstawie tytułu (YouTube, Discord itp.)</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-3 mt-6">
+                            <button id="btn-cancel-link"
+                                class="px-4 py-2 rounded-lg text-sm font-medium text-secondary hover:text-white transition-colors">Anuluj</button>
+                            <button id="btn-save-link"
+                                class="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">Zapisz
+                                Link</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="analytics-section" class="section-content hidden animate-fade-in">
+                <h1 class="text-2xl font-display font-bold mb-4">Analityka</h1>
+                <p class="text-secondary mb-8">Szczegółowe informacje o Twoim ruchu.</p>
+
+                <div class="glass-card p-8 rounded-xl text-center">
+                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Zaawansowana Analityka wkrótce</h3>
+                    <p class="text-secondary max-w-md mx-auto">Pracujemy nad szczegółowymi statystykami, mapami
+                        cieplnymi i śledzeniem konwersji. Ta funkcja będzie dostępna w następnej aktualizacji.</p>
+                </div>
+            </div>
+
+            <div id="files-section" class="section-content hidden animate-fade-in">
+                <header class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-display font-bold mb-2">Menedżer Plików (Mega-Style)</h1>
+                        <p class="text-secondary">Przesyłaj pliki do 2GB i generuj linki.</p>
+                    </div>
+                    <label
+                        class="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        Prześlij Plik
+                        <input type="file" id="file-upload-input" class="hidden">
+                    </label>
+                </header>
+
+                <div id="upload-progress-container" class="hidden mb-6 glass-card p-4 rounded-xl">
+                    <div class="flex justify-between text-xs text-secondary mb-2">
+                        <span>Przesyłanie...</span>
+                        <span id="upload-percentage">0%</span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full h-2">
+                        <div id="upload-bar" class="bg-white h-2 rounded-full transition-all duration-300"
+                            style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/5 text-secondary uppercase text-xs">
+                            <tr>
+                                <th class="px-6 py-4 font-medium">Nazwa</th>
+                                <th class="px-6 py-4 font-medium">Rozmiar</th>
+                                <th class="px-6 py-4 font-medium">Typ</th>
+                                <th class="px-6 py-4 font-medium text-right">Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="files-list-body">
+                            <!-- Files will be rendered here dynamically -->
+                        </tbody>
+                    </table>
+                    <div id="no-files-message" class="text-center py-12 text-secondary">
+                        <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        <p class="text-sm">Brak przesłanych plików</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-section" class="section-content hidden animate-fade-in">
+                <h1 class="text-2xl font-display font-bold mb-4">Ustawienia Konta</h1>
+                <p class="text-secondary mb-8">Zarządzaj preferencjami swojego konta.</p>
+
+                <div class="space-y-6 max-w-2xl">
+                    <div class="glass-card p-6 rounded-xl">
+                        <h3 class="text-lg font-medium text-white mb-4">Dane Osobowe</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label id="settings-email-label" class="block text-xs text-secondary mb-2">Email</label>
+                                <input id="settings-email" type="text"
+                                    class="form-input w-full px-3 py-2 rounded-lg text-sm" value="user@example.com"
+                                    disabled>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-secondary mb-2">Nazwa Użytkownika</label>
+                                <input id="settings-username" type="text"
+                                    class="form-input w-full px-3 py-2 rounded-lg text-sm" value="rekin_boss" disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-xl">
+                        <h3 class="text-lg font-medium text-white mb-4">Bezpieczeństwo</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-secondary mb-2">Obecne Hasło</label>
+                                <input type="password" id="current-password"
+                                    class="form-input w-full px-3 py-2 rounded-lg text-sm bg-white text-black"
+                                    placeholder="••••••••">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Nowe Hasło</label>
+                                    <input type="password" id="new-password"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm bg-white text-black"
+                                        placeholder="••••••••">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Potwierdź Nowe Hasło</label>
+                                    <input type="password" id="confirm-password"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm bg-white text-black"
+                                        placeholder="••••••••">
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button id="btn-change-password"
+                                    class="bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">Zmień
+                                    Hasło</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-xl border-red-500/20">
+                        <h3 class="text-lg font-medium text-red-500 mb-2">Strefa Niebezpieczna</h3>
+                        <p class="text-xs text-secondary mb-4">Te operacje są nieodwracalne.</p>
+                        <button id="delete-account-btn"
+                            class="border border-red-500/50 text-red-500 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-500/10 transition-colors">Usuń
+                            Konto</button>
+                    </div>
+
+                    <div id="delete-account-modal"
+                        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+                        <div
+                            class="glass-card w-full max-w-md p-6 rounded-xl m-4 border-red-500/20 shadow-2xl shadow-red-500/5">
+                            <div class="flex items-center gap-3 mb-4 text-red-500">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                    </path>
+                                </svg>
+                                <h3 class="text-xl font-bold text-white">Czy na pewno chcesz usunąć konto?</h3>
+                            </div>
+                            <p class="text-secondary text-sm mb-6 leading-relaxed">
+                                Tej operacji <span class="text-red-400 font-medium">nie można cofnąć</span>. Wszystkie
+                                Twoje dane, linki, pliki oraz ustawienia profilu zostaną trwale usunięte z naszych
+                                serwerów.
+                            </p>
+
+                            <div class="mb-6 bg-white/5 p-4 rounded-lg border border-white/5">
+                                <label class="block text-xs text-secondary mb-2">Aby potwierdzić, wpisz <span
+                                        class="text-white font-bold select-none">USUŃ</span> poniżej</label>
+                                <input type="text" id="delete-confirmation-input"
+                                    class="form-input w-full px-3 py-2 rounded-lg text-sm bg-white text-black border-red-500/30 focus:border-red-500 focus:ring-1 focus:ring-red-500/50"
+                                    placeholder="USUŃ" autocomplete="off">
+                            </div>
+
+                            <div class="flex justify-end gap-3">
+                                <button id="btn-cancel-delete"
+                                    class="px-4 py-2 rounded-lg text-sm font-medium text-secondary hover:text-white transition-colors">Anuluj</button>
+                                <button id="btn-confirm-delete"
+                                    class="bg-red-500/10 text-red-500 border border-red-500/50 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-500/10 disabled:hover:text-red-500"
+                                    disabled>
+                                    <span class="flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg>
+                                        Usuń konto trwale
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="shop-section" class="section-content hidden animate-fade-in">
+                <header class="mb-8">
+                    <h1 class="text-2xl md:text-3xl font-display font-bold mb-2">Sklep z Dekoracjami</h1>
+                    <p class="text-secondary">Personalizuj swój profil z unikalnymi dekoracjami i efektami.</p>
+                </header>
+
+                <!-- Kategorie -->
+                <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                    <button class="shop-category-btn active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-category="all">
+                        Wszystko
+                    </button>
+                    <button class="shop-category-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-category="effects">
+                        Efekty Tła
+                    </button>
+                    <button class="shop-category-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-category="cursors">
+                        Kursory
+                    </button>
+                    <button class="shop-category-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-category="fonts">
+                        Czcionki
+                    </button>
+                    <button class="shop-category-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-category="badges">
+                        Odznaki
+                    </button>
+                    <button class="shop-category-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" data-category="animations">
+                        Animacje
+                    </button>
+                </div>
+
+                <!-- Produkty -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="shop-items">
+                    <!-- Efekty Tła -->
+                    <div class="glass-card rounded-xl overflow-hidden group cursor-pointer hover:border-white/20 transition-all" data-category="effects">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">✨</span>
+                                    <h3 class="text-lg font-semibold text-white">Efekt Gradient</h3>
+                                </div>
+                                <span class="text-white font-bold">30 zł</span>
+                            </div>
+                            <p class="text-xs text-secondary mb-4">Kolorowe gradienty animowane w tle twojego profilu</p>
+                            <button class="w-full bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                Kup teraz
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-xl overflow-hidden group cursor-pointer hover:border-white/20 transition-all" data-category="effects">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">⭐</span>
+                                    <h3 class="text-lg font-semibold text-white">Gwiazdy</h3>
+                                </div>
+                                <span class="text-white font-bold">10 zł</span>
+                            </div>
+                            <p class="text-xs text-secondary mb-4">Animowane gwiazdy w tle - efekt kosmosu</p>
+                            <button class="w-full bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                Kup teraz
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kursory -->
+                    <div class="glass-card rounded-xl overflow-hidden group cursor-pointer hover:border-white/20 transition-all" data-category="cursors">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">☝️</span>
+                                    <h3 class="text-lg font-semibold text-white">Kursor Neon</h3>
+                                </div>
+                                <span class="text-white font-bold">15 zł</span>
+                            </div>
+                            <p class="text-xs text-secondary mb-4">Neonowy kursor ze śladem świetlnym</p>
+                            <button class="w-full bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                Kup teraz
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Czcionki -->
+                    <div class="glass-card rounded-xl overflow-hidden group cursor-pointer hover:border-white/20 transition-all" data-category="fonts">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl font-bold" style="font-family: 'Courier New', monospace">Aa</span>
+                                    <h3 class="text-lg font-semibold text-white">Czcionka Retro</h3>
+                                </div>
+                                <span class="text-white font-bold">5 zł</span>
+                            </div>
+                            <p class="text-xs text-secondary mb-4">Vintage monospace dla nazwy użytkownika</p>
+                            <button class="w-full bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                Kup teraz
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Odznaki -->
+                    <div class="glass-card rounded-xl overflow-hidden group cursor-pointer hover:border-white/20 transition-all" data-category="badges">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl">🏆</span>
+                                    <h3 class="text-lg font-semibold text-white">Odznaka PRO</h3>
+                                </div>
+                                <span class="text-white font-bold">40 zł</span>
+                            </div>
+                            <p class="text-xs text-secondary mb-4">Złota odznaka PRO przy nazwie</p>
+                            <button class="w-full bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                Kup teraz
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Animacje -->
+                    <div class="glass-card rounded-xl overflow-hidden group cursor-pointer hover:border-white/20 transition-all" data-category="animations">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-3xl animate-pulse">🔥</span>
+                                    <h3 class="text-lg font-semibold text-white">Animacja Płomieni</h3>
+                                </div>
+                                <span class="text-white font-bold">5 zł</span>
+                            </div>
+                            <p class="text-xs text-secondary mb-4">Płonące ramki wokół avatara</p>
+                            <button class="w-full bg-white text-black px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                Kup teraz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </main>
+
+            <!-- Logout Confirmation Modal -->
+            <div id="logout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+                <div class="glass-card w-full max-w-md p-8 rounded-xl m-4 border border-white/10">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Wylogowanie</h3>
+                        <p class="text-secondary text-sm">Czy na pewno chcesz się wylogować?</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button id="logout-cancel" class="flex-1 px-4 py-3 rounded-lg text-sm font-medium text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                            Anuluj
+                        </button>
+                        <button id="logout-confirm" class="flex-1 px-4 py-3 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors">
+                            Wyloguj się
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script src="/main.js"></script>
+            <script>
+
+                document.addEventListener('DOMContentLoaded', async () => {
+                    db.requireAuth();
+                    const user = db.getCurrentUser();
+
+                    // Dodatkowe zabezpieczenie - jeśli user jest null, przekieruj do logowania
+                    if (!user) {
+                        window.location.href = 'login/';
+                        return;
+                    }
+
+                    // Obsługa przycisku wylogowania
+                    const logoutBtn = document.getElementById('logout-btn');
+                    const logoutModal = document.getElementById('logout-modal');
+                    const logoutCancel = document.getElementById('logout-cancel');
+                    const logoutConfirm = document.getElementById('logout-confirm');
+                    
+                    if (logoutBtn && logoutModal) {
+                        // Otwórz modal
+                        logoutBtn.addEventListener('click', () => {
+                            logoutModal.classList.remove('hidden');
+                        });
+                        
+                        // Anuluj wylogowanie
+                        logoutCancel.addEventListener('click', () => {
+                            logoutModal.classList.add('hidden');
+                        });
+                        
+                        // Potwierdź wylogowanie
+                        logoutConfirm.addEventListener('click', () => {
+                            db.logout();
+                        });
+                        
+                        // Zamknij modal po kliknięciu poza nim
+                        logoutModal.addEventListener('click', (e) => {
+                            if (e.target === logoutModal) {
+                                logoutModal.classList.add('hidden');
+                            }
+                        });
+                        
+                        // Zamknij modal klawiszem ESC
+                        document.addEventListener('keydown', (e) => {
+                            if (e.key === 'Escape' && !logoutModal.classList.contains('hidden')) {
+                                logoutModal.classList.add('hidden');
+                            }
+                        });
+                    }
+
+                    let viewsChartInst;
+
+                    const sidebarName = document.querySelector('.sidebar .text-sm.font-medium');
+                    const sidebarEmail = document.querySelector('.sidebar .text-xs.text-secondary');
+
+                    const isDiscord = user.email && !user.email.includes('@');
+                    const emailLabel = document.getElementById('settings-email-label');
+
+                    if (sidebarName) sidebarName.textContent = user.username;
+                    if (sidebarEmail) sidebarEmail.textContent = isDiscord ? `Discord ID: ${user.email}` : user.email;
+
+                    const settingsEmail = document.getElementById('settings-email');
+                    const settingsUsername = document.getElementById('settings-username');
+
+                    if (emailLabel && isDiscord) emailLabel.textContent = 'Discord ID';
+                    if (settingsEmail) settingsEmail.value = user.email;
+                    if (settingsUsername) settingsUsername.value = user.username;
+
+                    const profile = await db.getProfile(user.id);
+                    // Logo pozostaje jako logo - nie podmienia się na avatar
+
+                    // Check if user is admin and show admin panel link
+                    if (user.is_admin === 1 || user.is_admin === true) {
+                        const adminNavItem = document.getElementById('admin-nav-item');
+                        if (adminNavItem) adminNavItem.classList.remove('hidden');
+                    } else {
+                        // Try API check as fallback
+                        try {
+                            const res = await fetch(`${db.apiUrl}/admin/check`, {
+                                headers: {
+                                    'Authorization': `Bearer ${localStorage.getItem('swap_token')}`
+                                }
+                            });
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (data.isAdmin) {
+                                    const adminNavItem = document.getElementById('admin-nav-item');
+                                    if (adminNavItem) adminNavItem.classList.remove('hidden');
+                                }
+                            }
+                        } catch (err) {
+                            // jajcokurwa
+                        }
+                    }
+
+                    async function updateStats() {
+                        const stats = await db.getDashboardStats(user.id);
+                        document.getElementById('stat-views').textContent = (stats.views || 0).toLocaleString();
+                        document.getElementById('stat-clicks').textContent = (stats.clicks || 0).toLocaleString();
+                        document.getElementById('stat-profiles').textContent = stats.activeProfiles || 1;
+
+                        // Update Growth Indicators
+                        const vg = stats.views_growth || 0;
+                        const cg = stats.clicks_growth || 0;
+
+                        const vge = document.getElementById('stat-views-growth');
+                        const vgc = document.getElementById('stat-views-growth-container');
+                        if (vge && vgc) {
+                            vge.textContent = `${vg >= 0 ? '+' : ''}${vg}% od zeszłego tygodnia`;
+                            vgc.className = `flex items-center gap-1 mt-2 text-xs ${vg >= 0 ? 'text-green-400' : 'text-red-400'}`;
+                        }
+
+                        const cge = document.getElementById('stat-clicks-growth');
+                        const cgc = document.getElementById('stat-clicks-growth-container');
+                        if (cge && cgc) {
+                            cge.textContent = `${cg >= 0 ? '+' : ''}${cg}% od zeszłego tygodnia`;
+                            cgc.className = `flex items-center gap-1 mt-2 text-xs ${cg >= 0 ? 'text-green-400' : 'text-red-400'}`;
+                        }
+
+                        const storageEl = document.getElementById('stat-storage');
+                        if (storageEl) storageEl.textContent = stats.storage || '0 Bytes';
+
+                        // Update Chart
+                        if (typeof viewsChartInst !== 'undefined' && viewsChartInst && stats.history) {
+                            viewsChartInst.data.datasets[0].data = stats.history;
+                            viewsChartInst.update();
+                        }
+                    }
+
+                    async function updateActivity() {
+                        const activity = await db.getRecentActivity(user.id);
+                        const list = document.getElementById('recent-activity-list');
+                        if (!list) return;
+
+                        if (activity.length === 0) {
+                            list.innerHTML = '<div class="p-8 text-center text-sm text-secondary">Brak nowej aktywności.</div>';
+                            return;
+                        }
+
+                        list.innerHTML = activity.map(item => {
+                            let iconColor = 'bg-gray-500';
+                            if (item.event_type === 'file_upload') iconColor = 'bg-blue-500';
+                            if (item.event_type === 'profile_update') iconColor = 'bg-purple-500';
+                            if (item.event_type === 'link_update') iconColor = 'bg-green-500';
+                            if (item.event_type === 'password_change') iconColor = 'bg-red-500';
+
+                            const date = new Date(item.created_at);
+                            const relativeTime = getRelativeTime(date);
+
+                            return `
+                                <div class="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-2 h-2 rounded-full ${iconColor}"></div>
+                                        <div>
+                                            <p class="text-sm font-medium text-white">${formatEventType(item.event_type)}</p>
+                                            <p class="text-xs text-secondary">${item.description}</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-secondary">${relativeTime}</span>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+
+                    function formatEventType(type) {
+                        const types = {
+                            'file_upload': 'Dodano plik',
+                            'profile_update': 'Aktualizacja profilu',
+                            'link_update': 'Zmiana linków',
+                            'password_change': 'Zmiana hasła'
+                        };
+                        return types[type] || 'Aktywność';
+                    }
+
+                    function getRelativeTime(date) {
+                        const now = new Date();
+                        const diffInSeconds = Math.floor((now - date) / 1000);
+
+                        if (diffInSeconds < 60) return 'przed chwilą';
+                        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min temu`;
+                        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} godz. temu`;
+                        return date.toLocaleDateString();
+                    }
+
+                    // Initialize chart first
+                    Chart.defaults.color = '#A1A1AA';
+                    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.05)';
+                    Chart.defaults.font.family = "'Inter', sans-serif";
+
+                    const viewsHistory = db.getViewsHistory(user.id);
+
+                    const labels = [];
+                    const days = ['Ndz', 'Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob'];
+                    for (let i = 6; i >= 0; i--) {
+                        const d = new Date();
+                        d.setDate(d.getDate() - i);
+                        labels.push(days[d.getDay()]);
+                    }
+
+                    const ctxViews = document.getElementById('viewsChart').getContext('2d');
+                    viewsChartInst = new Chart(ctxViews, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Wyświetlenia',
+                                data: [0, 0, 0, 0, 0, 0, 0],
+                                borderColor: '#FFFFFF',
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true,
+                                pointBackgroundColor: '#000000',
+                                pointBorderColor: '#FFFFFF',
+                                pointBorderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        borderDash: [4, 4]
+                                    },
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    const ctxSources = document.getElementById('sourcesChart').getContext('2d');
+                    new Chart(ctxSources, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Bezpośrednie', 'Społecznościowe', 'Polecające'],
+                            datasets: [{
+                                data: [55, 30, 15],
+                                backgroundColor: [
+                                    '#FFFFFF',
+                                    '#52525b',
+                                    '#27272a'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            cutout: '70%',
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 20
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Now update stats after chart initialization
+                    updateStats();
+                    updateActivity();
+                    setInterval(() => {
+                        updateStats();
+                        updateActivity();
+                    }, 30000);
+
+                    const deleteBtn = document.getElementById('delete-account-btn');
+                    const deleteModal = document.getElementById('delete-account-modal');
+                    const deleteInput = document.getElementById('delete-confirmation-input');
+                    const btnConfirmDelete = document.getElementById('btn-confirm-delete');
+                    const btnCancelDelete = document.getElementById('btn-cancel-delete');
+
+                    if (deleteBtn && deleteModal) {
+                        deleteBtn.addEventListener('click', () => {
+                            deleteModal.classList.remove('hidden');
+                            deleteInput.value = '';
+                            btnConfirmDelete.disabled = true;
+                            deleteInput.focus();
+                        });
+
+                        btnCancelDelete.addEventListener('click', () => {
+                            deleteModal.classList.add('hidden');
+                        });
+
+                        // Close on escape key
+                        document.addEventListener('keydown', (e) => {
+                            if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+                                deleteModal.classList.add('hidden');
+                            }
+                        });
+
+                        // Close on click outside
+                        deleteModal.addEventListener('click', (e) => {
+                            if (e.target === deleteModal) {
+                                deleteModal.classList.add('hidden');
+                            }
+                        });
+
+                        deleteInput.addEventListener('input', (e) => {
+                            if (e.target.value === 'USUŃ') {
+                                btnConfirmDelete.disabled = false;
+                            } else {
+                                btnConfirmDelete.disabled = true;
+                            }
+                        });
+
+                        btnConfirmDelete.addEventListener('click', async () => {
+                            const originalText = btnConfirmDelete.innerHTML;
+                            btnConfirmDelete.disabled = true;
+                            btnConfirmDelete.innerHTML = '<span class="animate-pulse">Usuwanie...</span>';
+
+                            try {
+                                const res = await db.deleteAccount(user.id);
+                                if (!res.success) {
+                                    alert(res.message || 'Wystąpił błąd.');
+                                    btnConfirmDelete.disabled = false;
+                                    btnConfirmDelete.innerHTML = originalText;
+                                } else {
+                                    // Redirect handled by db.deleteAccount usually, but just in case
+                                    window.location.href = 'login/';
+                                }
+                            } catch (error) {
+                                console.error(error);
+                                alert('Wystąpił błąd krytyczny.');
+                                btnConfirmDelete.disabled = false;
+                                btnConfirmDelete.innerHTML = originalText;
+                            }
+                        });
+                    }
+
+                    const btnChangePassword = document.getElementById('btn-change-password');
+                    if (btnChangePassword) {
+                        btnChangePassword.addEventListener('click', async () => {
+                            const currentPassword = document.getElementById('current-password').value;
+                            const newPassword = document.getElementById('new-password').value;
+                            const confirmPassword = document.getElementById('confirm-password').value;
+
+                            if (!currentPassword || !newPassword || !confirmPassword) {
+                                alert('Wypełnij wszystkie pola haseł.');
+                                return;
+                            }
+
+                            if (newPassword !== confirmPassword) {
+                                alert('Nowe hasła nie są identyczne.');
+                                return;
+                            }
+
+                            btnChangePassword.disabled = true;
+                            btnChangePassword.textContent = 'Zmiana...';
+
+                            try {
+                                const res = await db.changePassword(user.id, currentPassword, newPassword);
+                                if (res.success) {
+                                    alert('Hasło zostało zmienione.');
+                                    document.getElementById('current-password').value = '';
+                                    document.getElementById('new-password').value = '';
+                                    document.getElementById('confirm-password').value = '';
+                                } else {
+                                    alert(res.message || 'Błąd podczas zmiany hasła.');
+                                }
+                            } catch (err) {
+                                alert('Wystąpił błąd połączenia.');
+                            } finally {
+                                btnChangePassword.disabled = false;
+                                btnChangePassword.textContent = 'Zmień Hasło';
+                            }
+                        });
+                    }
+
+
+                    // Combined listeners for dashboard functionality
+
+
+                    // Initialize notification system
+                    window.showNotification = (message, type = 'info') => {
+                        const notification = document.createElement('div');
+                        notification.className = `notification-toast ${type}`;
+
+                        const iconSVG = type === 'success'
+                            ? '<svg class="notification-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+                            : type === 'error'
+                                ? '<svg class="notification-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+                                : '<svg class="notification-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+
+                        notification.innerHTML = `
+                            ${iconSVG}
+                            <div class="notification-content">${message}</div>
+                            <svg class="notification-close" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        `;
+
+                        document.body.appendChild(notification);
+
+                        // Trigger animation
+                        setTimeout(() => notification.classList.add('show'), 10);
+
+                        // Close button
+                        const closeBtn = notification.querySelector('.notification-close');
+                        closeBtn.addEventListener('click', () => {
+                            notification.classList.remove('show');
+                            setTimeout(() => notification.remove(), 400);
+                        });
+
+                        // Auto remove after 4 seconds
+                        setTimeout(() => {
+                            notification.classList.remove('show');
+                            setTimeout(() => notification.remove(), 400);
+                        }, 4000);
+                    };
+
+                    // Initialize confirmation modal
+                    window.showConfirmModal = (title, message, onConfirm) => {
+                        const overlay = document.createElement('div');
+                        overlay.className = 'confirm-modal-overlay';
+
+                        overlay.innerHTML = `
+                            <div class="confirm-modal">
+                                <svg class="confirm-modal-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <div class="confirm-modal-title">${title}</div>
+                                <div class="confirm-modal-message">${message}</div>
+                                <div class="confirm-modal-actions">
+                                    <button class="confirm-modal-btn confirm-modal-btn-cancel">Anuluj</button>
+                                    <button class="confirm-modal-btn confirm-modal-btn-delete">Usun</button>
+                                </div>
+                            </div>
+                        `;
+
+                        document.body.appendChild(overlay);
+
+                        // Show modal
+                        setTimeout(() => overlay.classList.add('show'), 10);
+
+                        const closeModal = () => {
+                            overlay.classList.remove('show');
+                            setTimeout(() => overlay.remove(), 300);
+                        };
+
+                        // Cancel button
+                        overlay.querySelector('.confirm-modal-btn-cancel').addEventListener('click', closeModal);
+
+                        // Delete button
+                        overlay.querySelector('.confirm-modal-btn-delete').addEventListener('click', () => {
+                            onConfirm();
+                            closeModal();
+                        });
+
+                        // Click outside to close
+                        overlay.addEventListener('click', (e) => {
+                            if (e.target === overlay) closeModal();
+                        });
+                    };
+
+
+
+                    const linkListContainer = document.getElementById('dashboard-link-list');
+                    const modal = document.getElementById('link-modal');
+                    const btnAdd = document.getElementById('btn-add-link');
+                    const btnCancel = document.getElementById('btn-cancel-link');
+                    const btnSave = document.getElementById('btn-save-link');
+
+                    const inputTitle = document.getElementById('link-title-input');
+                    const inputUrl = document.getElementById('link-url-input');
+                    const inputIcon = document.getElementById('link-icon-input');
+
+                    let editingIndex = -1;
+
+                    async function renderLinks() {
+                        const profile = await db.getProfile(user.id);
+                        const links = profile.links || [];
+
+                        linkListContainer.innerHTML = '';
+
+                        if (links.length === 0) {
+                            linkListContainer.innerHTML = '<div class="text-center py-8 text-secondary border border-dashed border-white/10 rounded-xl">Brak linków. Dodaj jeden, aby zacząć!</div>';
+                            return;
+                        }
+
+                        links.forEach((link, index) => {
+                            let iconDisplay = '';
+                            if (link.icon) {
+                                iconDisplay = `<img src="${link.icon}" class="w-10 h-10 rounded-lg object-cover bg-white/5">`;
+                            } else {
+                                let svg = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>';
+                                if (link.title.toLowerCase().includes('youtube')) svg = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>';
+                                if (link.title.toLowerCase().includes('discord')) svg = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>';
+
+                                iconDisplay = `<div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-secondary">${svg}</div>`;
+                            }
+
+                            const html = `
+                                    <div class="glass-card p-4 rounded-xl flex items-center justify-between group">
+                                        <div class="flex items-center gap-4">
+                                            ${iconDisplay}
+                                            <div>
+                                                <h4 class="font-medium text-white">${link.title}</h4>
+                                                <a href="${link.url}" target="_blank" class="text-xs text-secondary hover:text-white transition-colors truncate max-w-[200px] block">${link.url}</a>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="editLink(${index})" class="p-2 text-secondary hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            </button>
+                                            <button onclick="deleteLink(${index})" class="p-2 text-secondary hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            linkListContainer.insertAdjacentHTML('beforeend', html);
+                        });
+                    }
+
+                    btnAdd.addEventListener('click', () => {
+                        editingIndex = -1;
+                        document.getElementById('modal-title').textContent = 'Dodaj Nowy Link';
+                        inputTitle.value = '';
+                        inputUrl.value = '';
+                        inputIcon.value = '';
+                        modal.classList.remove('hidden');
+                    });
+
+                    btnCancel.addEventListener('click', () => {
+                        modal.classList.add('hidden');
+                    });
+
+                    btnSave.addEventListener('click', async () => {
+                        const title = inputTitle.value.trim();
+                        const url = inputUrl.value.trim();
+                        const icon = inputIcon.value.trim();
+
+                        if (!title || !url) {
+                            alert('Proszę podać tytuł i URL');
+                            return;
+                        }
+
+                        const profile = await db.getProfile(user.id);
+                        const links = profile.links || [];
+
+                        const newLink = { title, url, icon };
+
+                        if (editingIndex >= 0) {
+                            links[editingIndex] = newLink;
+                        } else {
+                            links.push(newLink);
+                        }
+
+                        db.saveProfile(user.id, { links });
+                        renderLinks();
+                        modal.classList.add('hidden');
+
+                        if (window.showNotification) window.showNotification('Link zapisany pomyślnie!', 'success');
+                    });
+
+                    window.editLink = async (index) => {
+                        const profile = await db.getProfile(user.id);
+                        const link = profile.links[index];
+                        if (!link) return;
+
+                        editingIndex = index;
+                        document.getElementById('modal-title').textContent = 'Edytuj Link';
+                        inputTitle.value = link.title;
+                        inputUrl.value = link.url;
+                        inputIcon.value = link.icon || '';
+                        modal.classList.remove('hidden');
+                    };
+
+                    window.deleteLink = async (index) => {
+                        if (confirm('Czy na pewno chcesz usunąć ten link?')) {
+                            const profile = await db.getProfile(user.id);
+                            const links = profile.links || [];
+                            links.splice(index, 1);
+                            db.saveProfile(user.id, { links });
+                            renderLinks();
+                        }
+                    };
+
+                    const fileInput = document.getElementById('file-upload-input');
+                    const filesListBody = document.getElementById('files-list-body');
+                    const uploadProgressContainer = document.getElementById('upload-progress-container');
+                    const uploadBar = document.getElementById('upload-bar');
+                    const uploadPercentage = document.getElementById('upload-percentage');
+                    const noFilesMessage = document.getElementById('no-files-message');
+
+                    async function renderFiles() {
+                        if (!filesListBody) return;
+
+                        const files = await db.getFiles();
+                        filesListBody.innerHTML = '';
+
+                        if (files.length === 0) {
+                            if (noFilesMessage) noFilesMessage.classList.remove('hidden');
+                        } else {
+                            if (noFilesMessage) noFilesMessage.classList.add('hidden');
+                            files.forEach(file => {
+                                const date = new Date(file.createdAt).toLocaleDateString();
+                                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+                                const html = `
+                                    <tr class="hover:bg-white/5 transition-colors">
+                                        <td class="px-6 py-4 flex items-center gap-3">
+                                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                            <a href="${file.url}" target="_blank" class="text-white font-medium hover:underline">${file.name}</a>
+                                        </td>
+                                        <td class="px-6 py-4 text-secondary">${sizeMB} MB</td>
+                                        <td class="px-6 py-4 text-secondary">${file.type || 'Unknown'}</td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button onclick="copyFileLink('${file.url}')" class="text-secondary hover:text-blue-500 transition-colors mr-2" title="Kopiuj link">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                </svg>
+                                            </button>
+                                            <button onclick="deleteFile('${file.id}')" class="text-secondary hover:text-red-500 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                                filesListBody.insertAdjacentHTML('beforeend', html);
+                            });
+                        }
+                    }
+
+                    if (fileInput) {
+                        fileInput.addEventListener('change', async (e) => {
+                            const file = e.target.files[0];
+                            if (!file) return;
+
+                            if (file.size > 2 * 1024 * 1024 * 1024) {
+                                alert('Plik jest zbyt duży! Limit to 2GB.');
+                                return;
+                            }
+
+                            if (uploadProgressContainer) uploadProgressContainer.classList.remove('hidden');
+
+                            try {
+                                const fileData = await db.saveFile(file);
+
+                                if (fileData) {
+                                    // db.saveFileMetadataLocally usunięte
+                                    await renderFiles();
+                                    await updateStats();
+                                    await updateActivity();
+                                    if (window.showNotification) window.showNotification('Plik przesłany pomyślnie!', 'success');
+                                } else {
+                                    alert('Błąd podczas przesyłania pliku.');
+                                }
+                            } catch (err) {
+                                console.error('Upload error:', err);
+                                alert('Wystąpił błąd podczas przesyłania pliku.');
+                            } finally {
+                                if (uploadProgressContainer) uploadProgressContainer.classList.add('hidden');
+                                if (uploadBar) uploadBar.style.width = '0%';
+                                fileInput.value = '';
+                            }
+                        });
+                    }
+
+                    window.deleteFile = (id) => {
+                        window.showConfirmModal(
+                            'Czy na pewno chcesz usunąć ten plik?',
+                            'Ta operacja jest nieodwracalna. Plik zostanie trwale usunięty.',
+                            async () => {
+                                const result = await db.deleteFile(id);
+                                if (result && result.success) {
+                                    await renderFiles();
+                                    await updateStats();
+                                    if (window.showNotification) {
+                                        window.showNotification('Plik usunięty pomyślnie!', 'success');
+                                    }
+                                } else {
+                                    if (window.showNotification) {
+                                        window.showNotification('Nie udało się usunąć pliku.', 'error');
+                                    }
+                                }
+                            }
+                        );
+                    };
+
+                    window.copyFileLink = (url) => {
+                        navigator.clipboard.writeText(url).then(() => {
+                            if (window.showNotification) {
+                                window.showNotification('Link skopiowany do schowka!', 'success');
+                            }
+                        }).catch(err => {
+                            console.error('Copy failed:', err);
+                            if (window.showNotification) {
+                                window.showNotification('Nie udało się skopiować linku', 'error');
+                            }
+                        });
+                    };
+
+                    // Initialize after all DOM elements are ready
+                    if (user) {
+                        await renderLinks();
+                        await renderFiles();
+                    }
+
+                    // Shop category filtering
+                    const categoryButtons = document.querySelectorAll('.shop-category-btn');
+                    const shopItems = document.querySelectorAll('#shop-items > div');
+
+                    categoryButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const category = btn.dataset.category;
+                            
+                            // Update active button
+                            categoryButtons.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            
+                            // Filter items
+                            shopItems.forEach(item => {
+                                if (category === 'all' || item.dataset.category === category) {
+                                    item.style.display = 'block';
+                                } else {
+                                    item.style.display = 'none';
+                                }
+                            });
+                        });
+                    });
+
+
+
+                });
+            </script>
+</body>
+
+</html>

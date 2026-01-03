@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pl" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>swap.lol - Linki Bio Premium & Hosting Plików</title>
+    <meta name="description"
+        content="Twórz profesjonalne, minimalistyczne strony bio-link i bezpiecznie hostuj pliki. Dołącz do nowej generacji cyfrowej tożsamości.">
+
+    <!-- Open Graph / Facebook / Discord -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://swaplol.com/">
+    <meta property="og:title" content="swap.lol - Linki Bio Premium & Hosting Plików">
+    <meta property="og:description" content="Twórz profesjonalne, minimalistyczne strony bio-link i bezpiecznie hostuj pliki. Dołącz do nowej generacji cyfrowej tożsamości.">
+    <meta property="og:image" content="https://i.ibb.co/BKjkWj2z/swapnigger.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://swaplol.com/">
+    <meta property="twitter:title" content="swap.lol - Linki Bio Premium & Hosting Plików">
+    <meta property="twitter:description" content="Twórz profesjonalne, minimalistyczne strony bio-link i bezpiecznie hostuj pliki. Dołącz do nowej generacji cyfrowej tożsamości.">
+    <meta property="twitter:image" content="https://i.ibb.co/BKjkWj2z/swapnigger.png">
+
+    <meta name="theme-color" content="#8a2be2">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'surface-hover': '#121212',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'primary': '#FFFFFF',
+                        'secondary': '#A1A1AA',
+                        'accent': '#FFFFFF',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(15, 15, 15, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #FFFFFF;
+            color: #000000;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: #E5E5E5;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #FFFFFF;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #FFFFFF;
+        }
+
+        .nav-link {
+            color: #A1A1AA;
+            transition: color 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: #FFFFFF;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #404040;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-white selection:text-black">
+    <nav class="fixed w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center gap-2">
+                        <img src="logo.png" alt="swap.lol" class="h-10">
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
+                    <a href="index.html#features" class="nav-link text-white">Funkcje</a>
+                    <a href="index.html#pricing" class="nav-link">Cennik</a>
+                    <a href="/profiles" class="nav-link">Profil</a>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <a href="https://discord.gg/eahF5dS3p6" target="_blank"
+                        class="text-secondary hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.086 2.157 2.419 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.086 2.157 2.419 0 1.334-.946 2.419-2.157 2.419z" />
+                        </svg>
+                    </a>
+                    <a href="login/" class="nav-link text-sm font-medium">Zaloguj się</a>
+                    <a href="login/#register" class="btn-primary px-5 py-2.5 rounded-lg text-sm">
+                        Rozpocznij
+                    </a>
+                </div>
+
+                <button id="mobile-menu-toggle" class="md:hidden text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-surface border-b border-white/5">
+            <div class="px-4 pt-2 pb-6 space-y-2 text-center">
+                <a href="index.html#features" class="block px-3 py-2 text-white hover:text-white">Funkcje</a>
+                <a href="index.html#pricing" class="block px-3 py-2 text-secondary font-medium">Cennik</a>
+                <a href="/profiles" class="block px-3 py-2 text-secondary font-medium">Profil</a>
+                <div class="pt-4 border-t border-white/5 mt-4">
+                    <a href="https://discord.gg/eahF5dS3p6" target="_blank"
+                        class="text-secondary hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.086 2.157 2.419 0 1.334-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.086 2.157 2.419 0 1.334-.946 2.419-2.157 2.419z" />
+                        </svg>
+                    </a>
+                    <a href="login/" class="block px-3 py-2 text-secondary hover:text-white">Zaloguj się</a>
+                    <a href="login/#register" class="block px-3 py-2 text-white font-medium">Zarejestruj się</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-white/[0.03] blur-[120px] rounded-full pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-secondary mb-8 fade-in-up">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span>v2.0 jest już dostępna</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-8 fade-in-up"
+                style="transition-delay: 100ms;">
+                Twoja Cyfrowa Tożsamość,<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">Wzniesiona na Wyższy
+                    Poziom.</span>
+            </h1>
+
+            <p class="text-lg md:text-xl text-secondary mb-12 max-w-2xl mx-auto leading-relaxed fade-in-up"
+                style="transition-delay: 200ms;">
+                Stwórz oszałamiającą, minimalistyczną stronę bio-link w kilka minut. Podziel się swoim światem za pomocą
+                jednego linku. Szybko,
+                bezpiecznie i z myślą o profesjonalistach.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center fade-in-up"
+                style="transition-delay: 300ms;">
+                <a href="login/#register" class="btn-primary px-8 py-4 rounded-lg text-base w-full sm:w-auto">
+                    Odbierz Swój Link
+                </a>
+                <a href="login/" class="btn-secondary px-8 py-4 rounded-lg text-base w-full sm:w-auto">
+                    Zaloguj się
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-8 max-w-4xl mx-auto mt-24 border-t border-white/5 pt-12 fade-in-up"
+                style="transition-delay: 400ms;">
+                <div class="text-center">
+                    <div class="text-3xl font-display font-bold text-white mb-1 counter">0</div>
+                    <p class="text-sm text-secondary uppercase tracking-wider">Użytkowników</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-display font-bold text-white mb-1 counter">0</div>
+                    <p class="text-sm text-secondary uppercase tracking-wider">Wyświetleń</p>
+                </div>
+                <div class="text-center col-span-2 md:col-span-1">
+                    <div class="text-3xl font-display font-bold text-white mb-1 counter">0</div>
+                    <p class="text-sm text-secondary uppercase tracking-wider">Przesłanych Plików</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-24 bg-surface/50 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-20 fade-in-up">
+                <h2 class="text-3xl md:text-4xl font-display font-bold mb-4">Wszystko, czego potrzebujesz</h2>
+                <p class="text-secondary max-w-2xl mx-auto">
+                    Potężne funkcje zamknięte w czystym, intuicyjnym interfejsie.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-card p-8 rounded-2xl fade-in-up">
+                    <div
+                        class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 border border-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Pełna Kontrola</h3>
+                    <p class="text-secondary leading-relaxed">
+                        Dostosuj każdy aspekt swojej strony. Od kolorów i czcionek po układ i odstępy. Spraw, by była
+                        naprawdę
+                        Twoja.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl fade-in-up" style="transition-delay: 100ms;">
+                    <div
+                        class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 border border-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Błyskawiczna Prędkość</h3>
+                    <p class="text-secondary leading-relaxed">
+                        Zoptymalizowany pod kątem szybkości. Twój profil ładuje się natychmiast w każdym miejscu na
+                        świecie, zapewniając, że nigdy nie stracisz
+                        kontaktu.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl fade-in-up" style="transition-delay: 200ms;">
+                    <div
+                        class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 border border-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Głęboka Analityka</h3>
+                    <p class="text-secondary leading-relaxed">
+                        Zrozum swoją publiczność dzięki szczegółowym statystykom. Śledź wyświetlenia, kliknięcia i
+                        zaangażowanie w czasie.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl fade-in-up">
+                    <div
+                        class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 border border-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Mobile First</h3>
+                    <p class="text-secondary leading-relaxed">
+                        Zaprojektowany dla nowoczesnego internetu. Twój profil wygląda idealnie na każdym urządzeniu, od
+                        telefonów po
+                        komputery.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl fade-in-up" style="transition-delay: 100ms;">
+                    <div
+                        class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 border border-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Bezpieczeństwo w Standardzie</h3>
+                    <p class="text-secondary leading-relaxed">
+                        Bezpieczeństwo klasy korporacyjnej dla każdego. Szyfrowane dane, ochrona przed DDoS i
+                        automatyczne kopie zapasowe.
+                    </p>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl fade-in-up" style="transition-delay: 200ms;">
+                    <div
+                        class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 border border-white/10">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Wsparcie Markdown</h3>
+                    <p class="text-secondary leading-relaxed">
+                        Pisz wygodnie. Używaj Markdown do formatowania swojego bio, opisów i treści z łatwością.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 fade-in-up">
+                <div class="max-w-xl">
+                    <h2 class="text-3xl md:text-4xl font-display font-bold mb-4">Wyróżnione Profile</h2>
+                    <p class="text-secondary">
+                        Zobacz, co jest możliwe z swap.lol. Od twórców po profesjonalistów.
+                    </p>
+                </div>
+                <a href="login/"
+                    class="hidden md:flex items-center gap-2 text-white hover:text-secondary transition-colors mt-4 md:mt-0">
+                    Stwórz własny
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="/rekin-boss" class="glass-card rounded-2xl p-6 text-center group cursor-pointer fade-in-up no-underline hover:no-underline">
+                    <div
+                        class="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-2 ring-white/10 group-hover:ring-white/30 transition-all">
+                        <img src="https://cdn.discordapp.com/avatars/1247606221444354132/22d489c841034f144137558616b94ac5.webp"
+                            alt="Profile" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-lg font-semibold mb-1">rekin_boss</h3>
+                    <p class="text-sm text-secondary mb-4">Owner</p>
+                    <div class="flex justify-center gap-2">
+                        <span
+                            class="px-2 py-1 rounded-md bg-white/5 border border-white/5 text-xs text-secondary">OWNER</span>
+                    </div>
+                </a>
+
+                <a href="/ogfifi" class="glass-card rounded-2xl p-6 text-center group cursor-pointer fade-in-up no-underline hover:no-underline"
+                    style="transition-delay: 100ms;">
+                    <div
+                        class="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden ring-2 ring-white/10 group-hover:ring-white/30 transition-all">
+                        <img src="https://cdn.discordapp.com/attachments/1398593527067185154/1455654408917487920/a_83e7a6fe0a671f11bec4a14d7125300c.gif?ex=6955834f&is=695431cf&hm=87f205a25ec873b47e0702be44016a92313c2f0fe06a5ea2ef359a426ecfe313&"
+                            alt="Profile" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-lg font-semibold mb-1">ogfifi</h3>
+                    <p class="text-sm text-secondary mb-4">Owner, Graphic Designer</p>
+                    <div class="flex justify-center gap-2">
+                        <span
+                            class="px-2 py-1 rounded-md bg-white/5 border border-white/5 text-xs text-secondary">OWNER</span>
+                        <span
+                            class="px-2 py-1 rounded-md bg-white/5 border border-white/5 text-xs text-secondary">GRAFIK</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="mt-8 text-center md:hidden">
+                <a href="login/" class="btn-secondary px-6 py-3 rounded-lg w-full">
+                    Stwórz własny
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 bg-white/[0.02]"></div>
+        <div class="max-w-4xl mx-auto text-center px-6 lg:px-8 relative z-10">
+            <h2 class="text-4xl md:text-5xl font-display font-bold mb-6 fade-in-up">
+                Gotowy, by zacząć?
+            </h2>
+            <p class="text-xl text-secondary mb-10 fade-in-up">
+                Dołącz do tysięcy twórców i profesjonalistów budujących swoją cyfrową obecność z swap.lol.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in-up">
+                <a href="login/#register" class="btn-primary px-8 py-4 rounded-lg text-lg">
+                    Stwórz Swoją Stronę
+                </a>
+                <a href="/pricing" class="btn-secondary px-8 py-4 rounded-lg text-lg">
+                    Zobacz Cennik
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-surface border-t border-white/5 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-2">
+                    <a href="index.html" class="text-2xl font-display font-bold text-white mb-4 block">swap.lol</a>
+                    <p class="text-secondary max-w-sm">
+                        Platforma premium bio-link dla profesjonalistów. Prosta, szybka i piękna.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white mb-4">Platforma</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#features" class="text-secondary hover:text-white transition-colors">Funkcje</a>
+                        </li>
+                        <li><a href="/pricing" class="text-secondary hover:text-white transition-colors">Cennik</a>
+                        </li>
+                        <li><a href="login/" class="text-secondary hover:text-white transition-colors">Zaloguj
+                                się</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white mb-4">Prawne</h4>
+                    <ul class="space-y-3">
+                        <li><a href="/privacy" class="text-secondary hover:text-white transition-colors">Polityka
+                                Prywatności</a>
+                        </li>
+                        <li><a href="/terms" class="text-secondary hover:text-white transition-colors">Warunki Usługi</a>
+                        </li>
+                        <li><a href="/privacy" class="text-secondary hover:text-white transition-colors">Polityka Cookies</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-secondary">
+                    © 2026 swap.lol. Wszelkie prawa zastrzeżone.
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="#" class="text-secondary hover:text-white transition-colors">
+                        <span class="sr-only">Discord</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
+                        </svg>
+                    </a>
+                    <a href="#" class="text-secondary hover:text-white transition-colors">
+                        <span class="sr-only">Twitter</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="api-client.js"></script>
+    <script>
+        // Funkcja do animacji liczników
+        function animateCounter(element, target) {
+            // Ensure target is a valid number
+            if (typeof target !== 'number' || isNaN(target)) {
+                console.error('Invalid target for counter:', target);
+                element.textContent = '0';
+                return;
+            }
+            
+            const duration = 2000; // 2 sekundy
+            const start = 0;
+            const increment = target / (duration / 16); // ~60fps
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = formatNumber(target);
+                    clearInterval(timer);
+                } else {
+                    element.textContent = formatNumber(Math.floor(current));
+                }
+            }, 16);
+        }
+
+        function formatNumber(num) {
+            // Add validation to prevent NaN
+            if (typeof num !== 'number' || isNaN(num)) {
+                return '0';
+            }
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        // Pobierz i wyświetl statystyki
+        async function loadStats() {
+            try {
+                const stats = await db.getGlobalStats();
+                const counters = document.querySelectorAll('.counter');
+
+                if (counters.length >= 3 && stats) {
+                    animateCounter(counters[0], stats.users);
+                    animateCounter(counters[1], stats.views);
+                    animateCounter(counters[2], stats.uploads);
+                }
+            } catch (e) {
+                console.error("Failed to load stats:", e);
+                // Ustaw domyślne wartości w przypadku błędu
+                const counters = document.querySelectorAll('.counter');
+                if (counters.length >= 3) {
+                    counters[0].textContent = '0';
+                    counters[1].textContent = '0';
+                    counters[2].textContent = '0';
+                }
+            }
+        }
+        
+        // Wait for DOM to be fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadStats);
+        } else {
+            loadStats();
+        }
+    </script>
+    <script src="main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warunki Usługi - Panel</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'surface-hover': '#121212',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'primary': '#FFFFFF',
+                        'secondary': '#A1A1AA',
+                        'accent': '#FFFFFF',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <div class="max-w-4xl mx-auto px-6 py-12">
+        <div class="mb-8">
+            <a href="/" class="inline-block mb-6">
+                <img src="/logo.png" alt="Logo" class="h-8">
+            </a>
+            <h1 class="text-4xl font-display font-bold mb-4">Warunki Usługi</h1>
+            <p class="text-secondary">Ostatnia aktualizacja: 30 grudnia 2025</p>
+        </div>
+
+        <div class="prose prose-invert max-w-none space-y-8">
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">1. Akceptacja Warunków</h2>
+                <p class="text-secondary leading-relaxed">
+                    Korzystając z naszej platformy, zgadzasz się przestrzegać niniejszych Warunków Usługi. Jeśli nie
+                    zgadzasz się z którymkolwiek z tych warunków, prosimy o zaprzestanie korzystania z naszych usług.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">2. Konto Użytkownika</h2>
+                <p class="text-secondary leading-relaxed mb-4">
+                    Podczas rejestracji zobowiązujesz się do:
+                </p>
+                <ul class="list-disc list-inside text-secondary space-y-2 ml-4">
+                    <li>Podawania prawdziwych i aktualnych informacji</li>
+                    <li>Zachowania poufności hasła</li>
+                    <li>Powiadamiania nas o jakimkolwiek nieautoryzowanym dostępie do Twojego konta</li>
+                    <li>Nieprzekazywania dostępu do konta innym osobom</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">3. Dozwolone Użycie</h2>
+                <p class="text-secondary leading-relaxed mb-4">
+                    Zgadzasz się korzystać z platformy wyłącznie w zgodzie z prawem. Zabrania się:
+                </p>
+                <ul class="list-disc list-inside text-secondary space-y-2 ml-4">
+                    <li>Publikowania treści niezgodnych z prawem, obraźliwych lub szkodliwych</li>
+                    <li>Naruszania praw autorskich lub innych praw własności intelektualnej</li>
+                    <li>Podszywania się pod inne osoby lub organizacje</li>
+                    <li>Prób uzyskania nieautoryzowanego dostępu do systemu</li>
+                    <li>Spamowania lub rozsyłania niechcianej komunikacji</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">4. Treści Użytkowników</h2>
+                <p class="text-secondary leading-relaxed">
+                    Jesteś wyłącznie odpowiedzialny za treści, które publikujesz na platformie. Zachowujemy prawo do
+                    usuwania treści naruszających niniejsze warunki bez uprzedniego powiadomienia.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">5. Usługi Premium</h2>
+                <p class="text-secondary leading-relaxed">
+                    Płatne funkcje premium są dostępne w ramach subskrypcji. Płatności są przetwarzane przez bezpieczne
+                    systemy płatności. Anulowanie subskrypcji możliwe jest w dowolnym momencie z poziomu panelu
+                    użytkownika.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">6. Prawa Własności Intelektualnej</h2>
+                <p class="text-secondary leading-relaxed">
+                    Wszystkie elementy platformy, włączając w to kod, grafiki, logo i zawartość, są własnością naszej
+                    firmy i chronione prawem autorskim. Kopiowanie, modyfikowanie lub rozpowszechnianie bez zgody jest
+                    zabronione.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">7. Ograniczenie Odpowiedzialności</h2>
+                <p class="text-secondary leading-relaxed">
+                    Platforma jest udostępniana "tak jak jest". Nie ponosimy odpowiedzialności za jakiekolwiek straty
+                    wynikające z korzystania lub niemożności korzystania z naszych usług.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">8. Zmiany w Warunkach</h2>
+                <p class="text-secondary leading-relaxed">
+                    Zastrzegamy sobie prawo do modyfikowania niniejszych Warunków Usługi w dowolnym momencie.
+                    Użytkownicy zostaną powiadomieni o istotnych zmianach za pośrednictwem wiadomości email lub
+                    powiadomienia na platformie.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold mb-4">9. Kontakt</h2>
+                <p class="text-secondary leading-relaxed">
+                    W przypadku pytań dotyczących Warunków Usługi, skontaktuj się z nami poprzez formularz kontaktowy
+                    dostępny na stronie.
+                </p>
+            </section>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-white/10">
+            <a href="/login/" class="text-white hover:underline">← Powrót do logowania</a>
+        </div>
+    </div>
+</body>
+
+</html>

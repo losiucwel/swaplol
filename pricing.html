@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cennik - swap.lol</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'surface-hover': '#121212',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'primary': '#FFFFFF',
+                        'secondary': '#A1A1AA',
+                        'accent': '#FFFFFF',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(15, 15, 15, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #FFFFFF;
+            color: #000000;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: #E5E5E5;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #FFFFFF;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #FFFFFF;
+        }
+
+        .nav-link {
+            color: #A1A1AA;
+            transition: color 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            color: #FFFFFF;
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #FFFFFF;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #FFFFFF;
+        }
+
+        .check-icon {
+            color: #FFFFFF;
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .cross-icon {
+            color: #52525b;
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+    <nav class="fixed w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center gap-2">
+                        <img src="/logo.png" alt="swap.lol" class="h-10">
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/#features" class="nav-link">Funkcje</a>
+                    <a href="/pricing" class="nav-link text-white">Cennik</a>
+                    <a href="/profiles" class="nav-link">Galeria</a>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <a href="login/" class="nav-link text-sm font-medium">Zaloguj się</a>
+                    <a href="login/#register" class="btn-primary px-5 py-2.5 rounded-lg text-sm">
+                        Rozpocznij
+                    </a>
+                </div>
+
+                <button id="mobile-menu-toggle" class="md:hidden text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-surface border-b border-white/5">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="/#features" class="block px-3 py-2 text-secondary hover:text-white">Funkcje</a>
+                <a href="/pricing" class="block px-3 py-2 text-white font-medium">Cennik</a>
+                <a href="/profiles" class="block px-3 py-2 text-secondary hover:text-white">Galeria</a>
+                <div class="pt-4 border-t border-white/5 mt-4">
+                    <a href="login/" class="block px-3 py-2 text-secondary hover:text-white">Zaloguj się</a>
+                    <a href="login/#register" class="block px-3 py-2 text-white font-medium">Zarejestruj się</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-32 pb-24 relative overflow-hidden">
+        <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-white/[0.03] blur-[120px] rounded-full pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16 animate-fade-in">
+                <h1 class="text-4xl md:text-5xl font-display font-bold mb-6">Prosty, przejrzysty cennik</h1>
+                <p class="text-xl text-secondary max-w-2xl mx-auto mb-10">
+                    Wybierz plan dopasowany do Twoich potrzeb. Bez ukrytych opłat.
+                </p>
+
+                <div class="flex items-center justify-center gap-4">
+                    <span class="text-sm font-medium text-white">Miesięcznie</span>
+                    <label for="pricing-toggle" class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="pricing-toggle" class="sr-only peer">
+                        <div
+                            class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-white/20">
+                        </div>
+                    </label>
+                    <span class="text-sm font-medium text-secondary">Rocznie <span
+                            class="text-green-400 text-xs ml-1">-20%</span></span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="glass-card p-8 rounded-2xl animate-fade-in">
+                    <h3 class="text-lg font-semibold mb-2">Darmowy</h3>
+                    <p class="text-secondary text-sm mb-6">Idealny na start.</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white">0 PLN</span>
+                        <span class="text-secondary">/msc</span>
+                    </div>
+                    <a href="login/#register"
+                        class="btn-secondary w-full py-3 rounded-lg block text-center mb-8">Rozpocznij</a>
+
+                    <ul class="space-y-4 text-sm text-secondary">
+                        <li class="flex items-center gap-3">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            1 Strona Bio Link
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Podstawowa Analityka
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            500MB Miejsca na Pliki
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="cross-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Własna Domena
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="cross-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Usuń Branding
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl border-white/20 relative animate-fade-in"
+                    style="transition-delay: 100ms;">
+                    <div
+                        class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                        Najpopularniejszy
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Premium</h3>
+                    <p class="text-secondary text-sm mb-6">Dla twórców i profesjonalistów.</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white monthly-price">30 PLN</span>
+                        <span class="text-4xl font-bold text-white yearly-price hidden">25 PLN</span>
+                        <span class="text-secondary">/msc</span>
+                    </div>
+                    <a href="login/#register"
+                        class="btn-primary w-full py-3 rounded-lg block text-center mb-8" onclick="initiateCheckout(event, 'premium')">Kup Teraz</a>
+
+                    <ul class="space-y-4 text-sm text-secondary">
+                        <li class="flex items-center gap-3 text-white">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            1 Profil Premium
+                        </li>
+                        <li class="flex items-center gap-3 text-white">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Zaawansowana Analityka
+                        </li>
+                        <li class="flex items-center gap-3 text-white">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            10GB Miejsca na Pliki
+                        </li>
+                        <li class="flex items-center gap-3 text-white">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Własna Domena
+                        </li>
+                        <li class="flex items-center gap-3 text-white">
+                            <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Brak Brandingu
+                        </li>
+                    </ul>
+                </div>
+
+
+            </div>
+
+            <div class="mt-24 max-w-3xl mx-auto">
+                <h2 class="text-3xl font-display font-bold text-center mb-12">Często Zadawane Pytania</h2>
+                <div class="space-y-6">
+                    <div class="glass-card p-6 rounded-xl">
+                        <h3 class="text-lg font-semibold mb-2">Czy mogę zmienić plan później?</h3>
+                        <p class="text-secondary">Tak, możesz zmienić plan na wyższy lub niższy w dowolnym momencie.
+                            Zmiany wchodzą w życie natychmiast.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl">
+                        <h3 class="text-lg font-semibold mb-2">Czy oferujecie zwroty?</h3>
+                        <p class="text-secondary">Oferujemy 14-dniową gwarancję zwrotu pieniędzy dla wszystkich płatnych
+                            planów. Bez zadawania pytań.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl">
+                        <h3 class="text-lg font-semibold mb-2">Co stanie się z moimi plikami, jeśli zmienię plan na
+                            niższy?</h3>
+                        <p class="text-secondary">Twoje pliki pozostaną bezpieczne, ale nie będziesz mógł przesyłać
+                            nowych, jeśli przekroczysz limit miejsca nowego planu.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-surface border-t border-white/5 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-2">
+                    <a href="index.html" class="text-2xl font-display font-bold text-white mb-4 block">swap.lol</a>
+                    <p class="text-secondary max-w-sm">
+                        Platforma bio-link premium dla profesjonalistów. Prosta, szybka i piękna.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white mb-4">Platforma</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html#features"
+                                class="text-secondary hover:text-white transition-colors">Funkcje</a></li>
+                        <li><a href="/pricing" class="text-secondary hover:text-white transition-colors">Cennik</a>
+                        </li>
+                        <li><a href="/profiles"
+                                class="text-secondary hover:text-white transition-colors">Galeria</a></li>
+                        <li><a href="login/" class="text-secondary hover:text-white transition-colors">Zaloguj
+                                się</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white mb-4">Prawne</h4>
+                    <ul class="space-y-3">
+                        <li><a href="/privacy" class="text-secondary hover:text-white transition-colors">Polityka
+                                Prywatności</a>
+                        </li>
+                        <li><a href="/terms" class="text-secondary hover:text-white transition-colors">Warunki Usługi</a>
+                        </li>
+                        <li><a href="/privacy" class="text-secondary hover:text-white transition-colors">Polityka Cookies</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-secondary">
+                    © 2026 Swap.lol. Wszelkie prawa zastrzeżone.
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="#" class="text-secondary hover:text-white transition-colors">
+                        <span class="sr-only">Discord</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
+                        </svg>
+                    </a>
+                    <a href="#" class="text-secondary hover:text-white transition-colors">
+                        <span class="sr-only">Twitter</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="/api-client.js"></script>
+    <script>
+        async function initiateCheckout(event, plan) {
+            event.preventDefault();
+            
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                localStorage.setItem('pendingCheckout', JSON.stringify({plan: plan, interval: document.getElementById('pricing-toggle')?.checked ? 'yearly' : 'monthly'}));
+                window.location.href = '/login/';
+                return;
+            }
+            
+            const pricingToggle = document.getElementById('pricing-toggle');
+            const interval = pricingToggle?.checked ? 'yearly' : 'monthly';
+            
+            try {
+                const response = await fetch('/api/checkout/session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        plan: plan,
+                        interval: interval
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert('Błąd podczas inicjowania płatności. Spróbuj ponownie.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Błąd podczas przetwarzania. Spróbuj ponownie.');
+            }
+        }
+    </script>
+    <script src="main.js"></script>
+</body>
+
+</html>

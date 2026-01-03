@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarządzaj Stroną - Panel</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'surface-hover': '#121212',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'primary': '#FFFFFF',
+                        'secondary': '#A1A1AA',
+                        'accent': '#FFFFFF',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', 'sans-serif';
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: #FFFFFF;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #A1A1AA;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .sidebar-nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+
+        .sidebar-nav-item.active {
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 3px;
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        select.form-input:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        select option {
+            background-color: #0A0A0A;
+            color: #FFFFFF;
+            padding: 12px;
+        }
+
+        .preview-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #click-overlay {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.5s ease;
+        }
+
+        .click-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .profile-content {
+            text-align: center;
+            z-index: 10;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .username-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.5rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .bio-display {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .rich-presence-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 0 auto 2rem;
+            max-width: 400px;
+            text-align: left;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .rp-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .rp-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .rp-status-dot {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: #22c55e;
+            border: 3px solid #18181b;
+            border-radius: 50%;
+        }
+
+        .rp-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .rp-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .rp-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .rp-details {
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            margin-top: 2px;
+        }
+
+        .social-dock {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: white;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
+
+        .social-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .corner-control {
+            position: absolute;
+            z-index: 20;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 10px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .top-left {
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+        }
+
+        .bottom-left {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .notification-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transform: translateY(150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .notification-toast.show {
+            transform: translateY(0);
+        }
+
+        .notification-toast.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .notification-toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .premium-lock {
+            position: relative;
+        }
+
+        .premium-lock.locked {
+            opacity: 0.6;
+            pointer-events: none;
+            filter: grayscale(0.5);
+        }
+
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+            color: black;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: 8px;
+        }
+
+        .premium-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .premium-btn {
+            background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+            color: black;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            pointer-events: auto;
+            /* Allow clicking the button even if parent is locked pointer-events: none is tricky here, better to put overlay on top */
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* Background Effects */
+        .bg-effect-rain::before,
+        .bg-effect-snow::before,
+        .bg-effect-sparkles::before,
+        .bg-effect-particles::before,
+        .bg-effect-stars::before,
+        .bg-effect-matrix::before,
+        .bg-effect-waves::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bg-effect-rain::before {
+            background-image:
+                linear-gradient(180deg, transparent, rgba(173,216,230,0.4) 50%, transparent),
+                linear-gradient(180deg, transparent, rgba(173,216,230,0.3) 50%, transparent),
+                linear-gradient(180deg, transparent, rgba(173,216,230,0.5) 50%, transparent);
+            background-size: 1px 15px, 1px 20px, 1px 12px;
+            background-position: 10% 0, 50% 0, 90% 0;
+            animation: rain 1s linear infinite;
+        }
+
+        @keyframes rain {
+            to { 
+                background-position: 10% 100%, 50% 100%, 90% 100%;
+            }
+        }
+
+        .bg-effect-sparkles::before {
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(255,215,0,0.9) 2px, transparent 2px),
+                radial-gradient(circle at 60% 70%, rgba(255,255,255,0.9) 1px, transparent 1px),
+                radial-gradient(circle at 80% 20%, rgba(255,192,203,0.8) 1.5px, transparent 1.5px),
+                radial-gradient(circle at 30% 80%, rgba(173,216,230,0.8) 1px, transparent 1px),
+                radial-gradient(circle at 90% 50%, rgba(255,215,0,0.7) 1px, transparent 1px);
+            background-size: 200px 200px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { 
+                opacity: 0.4;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .bg-effect-crt::before {
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15) 0px,
+                rgba(0, 0, 0, 0.15) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+            animation: crtScanlines 0.2s linear infinite;
+        }
+
+        .bg-effect-crt::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(255,0,255,0.03),
+                rgba(0,255,255,0.03),
+                rgba(255,255,0,0.03)
+            );
+            animation: crtFlicker 0.15s infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes crtScanlines {
+            to { background-position: 0 4px; }
+        }
+
+        @keyframes crtFlicker {
+            0%, 100% { opacity: 0.95; }
+            50% { opacity: 1; }
+        }
+
+        .bg-effect-snow::before {
+            background-image:
+                radial-gradient(circle, rgba(255,255,255,0.8) 2px, transparent 2px),
+                radial-gradient(circle, rgba(255,255,255,0.6) 1.5px, transparent 1.5px),
+                radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px);
+            background-size: 120px 120px, 90px 90px, 150px 150px;
+            background-position: 0 0, 40px 60px, 80px 20px;
+            animation: snow 15s linear infinite;
+        }
+
+        @keyframes snow {
+            to { 
+                background-position: 60px 120px, 100px 180px, 140px 170px;
+            }
+        }
+
+        .bg-effect-particles::before {
+            background-image:
+                radial-gradient(circle, rgba(0,255,255,0.6) 2px, transparent 2px),
+                radial-gradient(circle, rgba(138,43,226,0.5) 1.5px, transparent 1.5px),
+                radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px),
+                radial-gradient(circle, rgba(0,255,255,0.3) 1px, transparent 1px);
+            background-size: 80px 80px, 100px 100px, 120px 120px, 90px 90px;
+            background-position: 0 0, 30px 40px, 60px 20px, 90px 70px;
+            animation: particles 25s linear infinite;
+        }
+
+        @keyframes particles {
+            to { 
+                background-position: 80px -80px, 130px -100px, 180px -120px, 180px -90px;
+            }
+        }
+
+        .bg-effect-stars::before {
+            background-image:
+                radial-gradient(circle at 15% 25%, rgba(255,255,255,1) 2px, transparent 2px),
+                radial-gradient(circle at 55% 65%, rgba(255,255,255,0.8) 1.5px, transparent 1.5px),
+                radial-gradient(circle at 75% 15%, rgba(255,255,255,0.9) 1px, transparent 1px),
+                radial-gradient(circle at 35% 55%, rgba(255,215,0,1) 2.5px, transparent 2.5px),
+                radial-gradient(circle at 85% 75%, rgba(255,255,255,0.7) 1px, transparent 1px),
+                radial-gradient(circle at 25% 85%, rgba(173,216,230,0.8) 1.5px, transparent 1.5px),
+                radial-gradient(circle at 65% 35%, rgba(255,255,255,0.6) 1px, transparent 1px),
+                radial-gradient(circle at 45% 15%, rgba(255,255,255,0.9) 1px, transparent 1px);
+            background-size: 100% 100%;
+            animation: stars 4s ease-in-out infinite;
+        }
+
+        @keyframes stars {
+            0%, 100% { 
+                opacity: 0.6;
+                filter: brightness(1);
+            }
+            25% { 
+                opacity: 0.9;
+                filter: brightness(1.3);
+            }
+            50% { 
+                opacity: 1;
+                filter: brightness(1.5);
+            }
+            75% { 
+                opacity: 0.8;
+                filter: brightness(1.2);
+            }
+        }
+
+        .bg-effect-matrix::before {
+            background-image:
+                linear-gradient(0deg, transparent 0%, rgba(0,255,0,0.2) 50%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, rgba(0,255,0,0.15) 50%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, rgba(0,255,0,0.25) 50%, transparent 100%);
+            background-size: 20px 40px, 15px 60px, 25px 50px;
+            background-position: 0 0, 8px 0, 18px 0;
+            animation: matrixRain 2s linear infinite;
+        }
+
+        .bg-effect-matrix::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 0, 0.03) 2px,
+                rgba(0, 255, 0, 0.03) 3px
+            );
+            pointer-events: none;
+            z-index: 1;
+            animation: matrixScanlines 0.1s linear infinite;
+        }
+
+        @keyframes matrixRain {
+            to { 
+                background-position: 0 40px, 8px 60px, 18px 50px;
+            }
+        }
+
+        @keyframes matrixScanlines {
+            to { 
+                background-position: 0 3px;
+            }
+        }
+
+        .bg-effect-waves::before {
+            background-image:
+                radial-gradient(ellipse at 30% 50%, rgba(0,255,255,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 50%, rgba(138,43,226,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.1) 0%, transparent 40%);
+            background-size: 150% 150%, 130% 130%, 160% 160%;
+            background-position: center;
+            animation: waves 6s ease-in-out infinite;
+        }
+
+        @keyframes waves {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.4;
+            }
+            25% {
+                transform: scale(1.1) rotate(5deg);
+                opacity: 0.6;
+            }
+            50% {
+                transform: scale(1.2) rotate(0deg);
+                opacity: 0.8;
+            }
+            75% {
+                transform: scale(1.1) rotate(-5deg);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.4;
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased h-screen flex overflow-hidden">
+
+    <aside class="w-64 bg-surface border-r border-white/5 flex flex-col">
+        <div class="p-6 border-b border-white/5">
+            <a href="/" class="block">
+                <img src="/logo.png" alt="Logo" class="h-8">
+            </a>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <div class="text-xs font-semibold text-secondary uppercase tracking-wider mb-2 px-2">Zarządzaj Stroną</div>
+            <div class="sidebar-nav-item active" data-tab="customize">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                    </path>
+                </svg>
+                Dostosuj
+            </div>
+            <div class="sidebar-nav-item" data-tab="links">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
+                    </path>
+                </svg>
+                Linki
+            </div>
+            <div class="sidebar-nav-item" data-tab="shop">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                Sklep / Szablony
+            </div>
+
+            <div class="mt-8 text-xs font-semibold text-secondary uppercase tracking-wider mb-2 px-2">Konto</div>
+            <a href="/dashboard/" class="sidebar-nav-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
+                Powrót do Panelu
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 bg-background">
+
+        <header
+            class="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-surface/50 backdrop-blur-sm z-20">
+            <h2 class="text-lg font-semibold text-white" id="page-title">Dostosuj Profil</h2>
+            <div class="flex items-center gap-3">
+                <button id="btn-copy-link"
+                    class="text-sm text-secondary hover:text-white flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                    Kopiuj Link
+                </button>
+                <a href="#" id="view-page-btn" target="_blank"
+                    class="text-sm text-secondary hover:text-white flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
+                    Zobacz Stronę 
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                </a>
+                <button id="btn-save-changes"
+                    class="bg-white text-black px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">Zapisz
+                    Zmiany</button>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            <div class="w-full md:w-1/2 overflow-y-auto p-8 border-r border-white/5">
+
+                <div id="tab-customize" class="space-y-8">
+
+                    <section>
+                        <h3 class="text-lg font-medium text-white mb-4">Przesyłanie Zasobów</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="glass-card p-4 rounded-xl">
+                                <label class="block text-xs text-secondary mb-2">Tło (Obraz/GIF/Wideo)</label>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" id="input-background"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="https://..."
+                                        value="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z5eXZ5eXZ5eXZ5eXZ5eXZ5eXZ5eXZ5eXZ5eXZ5eXZ5eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKSjRrfIPjeiVyM/giphy.gif">
+                                    <label
+                                        class="cursor-pointer bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                                            </path>
+                                        </svg>
+                                        <input type="file" id="file-background" class="hidden" accept="image/*,video/*">
+                                    </label>
+                                </div>
+                                <div class="h-32 bg-white/5 rounded-lg flex items-center justify-center border border-dashed border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                                    onclick="document.getElementById('file-background').click()">
+                                    <div class="text-center">
+                                        <svg class="w-6 h-6 mx-auto mb-2 text-secondary" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                        <span class="text-xs text-secondary">Kliknij, aby przesłać</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl">
+                                <label class="block text-xs text-secondary mb-2">Awatar Profilu</label>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" id="input-avatar"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="https://..."
+                                        value="">
+                                    <label
+                                        class="cursor-pointer bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                                            </path>
+                                        </svg>
+                                        <input type="file" id="file-avatar" class="hidden" accept="image/*">
+                                    </label>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <img src="" class="w-16 h-16 rounded-full object-cover border border-white/10"
+                                        id="avatar-preview-small">
+                                    <button
+                                        class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded transition-colors"
+                                        onclick="document.getElementById('file-avatar').click()">Prześlij
+                                        Nowy</button>
+                                </div>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl">
+                                <label class="block text-xs text-secondary mb-2">Audio (URL MP3)</label>
+                                <input type="text" id="input-audio"
+                                    class="form-input w-full px-3 py-2 rounded-lg text-sm" placeholder="https://...">
+                            </div>
+                            <div class="glass-card p-4 rounded-xl">
+                                <label class="block text-xs text-secondary mb-2">Własny Kursor (URL PNG)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="input-cursor"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm"
+                                        placeholder="https://...">
+                                    <label
+                                        class="cursor-pointer bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                                            </path>
+                                        </svg>
+                                        <input type="file" id="file-cursor" class="hidden"
+                                            accept="image/png,image/x-icon">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-lg font-medium text-white mb-4">Ogólne Dostosowanie</h3>
+                        <div class="glass-card p-6 rounded-xl space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs text-secondary mb-1">Wyświetlana Nazwa</label>
+                                    <input type="text" id="input-username"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm" value="rekin_boss">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-secondary mb-1">Bio</label>
+                                    <input type="text" id="input-bio"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm"
+                                        value="rekin_boss, owner Nexus Hub, Młody Youtuber">
+                                </div>
+                                <div class="col-span-1 md:col-span-2">
+                                    <label class="block text-xs text-secondary mb-1">ID Użytkownika Discord (dla Statusu
+                                        Live)</label>
+                                    <input type="text" id="input-discord-id"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm"
+                                        placeholder="np. 123456789012345678">
+                                    <p class="text-[10px] text-secondary mt-1">Włącz "Tryb Deweloperski" w Discord >
+                                        Kliknij Prawym na Swoją Nazwę > Kopiuj ID Użytkownika. Musisz być również na
+                                        serwerze <a href="https://discord.gg/lanyard" target="_blank"
+                                            class="underline hover:text-white">Lanyard Discord</a>, aby to zadziałało.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Przezroczystość Profilu</label>
+                                    <input type="range" id="input-opacity" min="0" max="100" value="60"
+                                        class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer">
+                                    <div class="flex justify-between text-xs text-secondary mt-1">
+                                        <span>0%</span>
+                                        <span>100%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Rozmycie Profilu</label>
+                                    <input type="range" id="input-blur" min="0" max="20" value="12"
+                                        class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer">
+                                    <div class="flex justify-between text-xs text-secondary mt-1">
+                                        <span>0px</span>
+                                        <span>20px</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Efekty Tła</label>
+                                    <select id="input-bg-effect" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                        <option value="none">Brak</option>
+                                        <option value="rain">Deszcz</option>
+                                        <option value="snow">Śnieg</option>
+                                        <option value="sparkles">Iskierki</option>
+                                        <option value="crt">Skanowanie CRT</option>
+                                        <option value="particles">Cząsteczki</option>
+                                        <option value="stars">Gwiazdy</option>
+                                        <option value="matrix">Matrix</option>
+                                        <option value="waves">Fale</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Efekty Nazwy Użytkownika</label>
+                                    <select id="input-username-effect"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                        <option value="none">Brak</option>
+                                        <option value="glow">Poświata</option>
+                                        <option value="glitch">Glitch</option>
+                                        <option value="rainbow">Tęcza</option>
+                                        <option value="neon">Neon</option>
+                                        <option value="fire">Ogień</option>
+                                        <option value="wave">Fala</option>
+                                        <option value="typewriter">Maszyna do pisania</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Układ Profilu</label>
+                                    <select id="input-layout" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                        <option value="center">Wyśrodkowany</option>
+                                        <option value="left">Lewostronny</option>
+                                        <option value="right">Prawostronny</option>
+                                        <option value="split">Podzielony</option>
+                                        <option value="card">Kartowy</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Animacje Przejścia</label>
+                                    <select id="input-transition" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                        <option value="fade">Zanikanie</option>
+                                        <option value="slide">Przesuwanie</option>
+                                        <option value="zoom">Powiększanie</option>
+                                        <option value="bounce">Odbicie</option>
+                                        <option value="rotate">Obrót</option>
+                                        <option value="none">Brak</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Styl Linków</label>
+                                    <select id="input-link-style" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                        <option value="minimal">Minimalistyczny</option>
+                                        <option value="card">Karty</option>
+                                        <option value="glass">Szklane</option>
+                                        <option value="neon">Neonowe</option>
+                                        <option value="gradient">Gradientowe</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Układ Linków</label>
+                                    <select id="input-link-layout" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                        <option value="vertical">Pionowo</option>
+                                        <option value="horizontal">Poziomo</option>
+                                        <option value="grid">Siatka</option>
+                                        <option value="masonry">Murarstwo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-lg font-medium text-white mb-4">Dostosowanie Kolorów</h3>
+                        <div class="glass-card p-6 rounded-xl">
+                            <div class="flex flex-wrap gap-4">
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Kolor Akcentu</label>
+                                    <div class="flex gap-2">
+                                        <div class="w-8 h-8 rounded-full bg-white border-2 border-white cursor-pointer accent-color-preset" data-color="#ffffff">
+                                        </div>
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-blue-500 border-2 border-transparent cursor-pointer accent-color-preset" data-color="#3b82f6">
+                                        </div>
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-purple-500 border-2 border-transparent cursor-pointer accent-color-preset" data-color="#a855f7">
+                                        </div>
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-red-500 border-2 border-transparent cursor-pointer accent-color-preset" data-color="#ef4444">
+                                        </div>
+                                        <input type="color" id="input-accent-color"
+                                            class="w-8 h-8 rounded-full bg-transparent border-0 p-0 cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="premium-section">
+                        <h3 class="text-lg font-medium text-white mb-4 flex items-center">
+                            Dostosowanie Premium
+                        </h3>
+                        <div class="glass-card p-6 rounded-xl premium-lock" id="premium-container">
+                            <div class="premium-overlay" id="premium-overlay" style="display: none;">
+                                <div class="text-center">
+                                    <div
+                                        class="p-3 bg-black/50 backdrop-blur-md rounded-xl border border-white/10 shadow-xl">
+                                        <p class="text-sm font-bold text-white mb-3">Ta sekcja wymaga Premium</p>
+                                        <a href="#" class="premium-btn">Odblokuj Teraz</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Własny Tag (Badge)</label>
+                                    <input type="text" id="input-badge"
+                                        class="form-input w-full px-3 py-2 rounded-lg text-sm"
+                                        placeholder="np. BOSS, DEV, VIP (max 10 znaków)" maxlength="10">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-secondary mb-2">Czcionka Profilu</label>
+                                    <select id="input-font" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                        <option value="Inter">Inter (Domyślna)</option>
+                                        <option value="Poppins">Poppins (Nowoczesna)</option>
+                                        <option value="Outfit">Outfit (Czysta)</option>
+                                        <option value="Space Grotesk">Space Grotesk (Tech)</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-2">Poświata Karty (Glow)</label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="color" id="input-card-glow"
+                                                class="h-8 w-12 bg-transparent border-0 p-0 cursor-pointer"
+                                                value="#000000">
+                                            <span class="text-xs text-secondary">Wybierz kolor</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-6">
+                                        <input type="checkbox" id="input-card-tilt"
+                                            class="w-4 h-4 rounded bg-white/10 border-white/20 accent-amber-500">
+                                        <label for="input-card-tilt" class="text-sm text-secondary font-medium">Animacja
+                                            3D Tilt</label>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-2">Kształt Avatara</label>
+                                        <select id="input-avatar-shape" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                            <option value="circle">Okrągły</option>
+                                            <option value="square">Kwadratowy</option>
+                                            <option value="rounded">Zaokrąglony</option>
+                                            <option value="hexagon">Sześciokąt</option>
+                                            <option value="diamond">Diament</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-2">Ramka Avatara</label>
+                                        <select id="input-avatar-border" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                            <option value="none">Brak</option>
+                                            <option value="solid">Solid</option>
+                                            <option value="gradient">Gradient</option>
+                                            <option value="glow">Poświata</option>
+                                            <option value="animated">Animowana</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-2">Efekt Tła Karty</label>
+                                        <select id="input-card-bg" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                            <option value="blur">Blur</option>
+                                            <option value="glass">Szkliś</option>
+                                            <option value="solid">Solidny</option>
+                                            <option value="gradient">Gradient</option>
+                                            <option value="transparent">Przezroczysty</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-6">
+                                        <input type="checkbox" id="input-particles"
+                                            class="w-4 h-4 rounded bg-white/10 border-white/20 accent-amber-500">
+                                        <label for="input-particles" class="text-sm text-secondary font-medium">Animowane Cząsteczki</label>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6">
+                                    <label class="block text-xs text-secondary mb-2">Kolor Ramki Avatara</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="color" id="input-avatar-border-color"
+                                            class="h-8 w-12 bg-transparent border-0 p-0 cursor-pointer"
+                                            value="#ffffff">
+                                        <span class="text-xs text-secondary">Kolor ramki/poświaty avatara</span>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-2">Wielkość Avatara</label>
+                                        <select id="input-avatar-size" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                            <option value="small">Mały (64px)</option>
+                                            <option value="medium" selected>Normalny (80px)</option>
+                                            <option value="large">Duży (96px)</option>
+                                            <option value="xlarge">Bardzo Duży (120px)</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-6">
+                                        <input type="checkbox" id="input-avatar-pulse"
+                                            class="w-4 h-4 rounded bg-white/10 border-white/20 accent-amber-500">
+                                        <label for="input-avatar-pulse" class="text-sm text-secondary font-medium">Pulsujący Avatar</label>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-2">Efekt Tekstu Bio</label>
+                                        <select id="input-bio-effect" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                            <option value="none">Brak</option>
+                                            <option value="fade">Zanikanie</option>
+                                            <option value="slide">Przesunięcie</option>
+                                            <option value="typewriter">Maszyna do pisania</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-2">Cień Tekstu Nazwy</label>
+                                        <select id="input-username-shadow" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                            <option value="none">Brak</option>
+                                            <option value="soft">Delikatny</option>
+                                            <option value="hard">Mocny</option>
+                                            <option value="colored">Kolorowy</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                    <div>
+                                        <label class="block text-xs text-secondary mb-2">Efekt Hover Linków</label>
+                                        <select id="input-link-hover" class="form-input w-full px-3 py-2 rounded-lg text-sm">
+                                            <option value="scale">Powiększenie</option>
+                                            <option value="glow">Poświata</option>
+                                            <option value="lift">Uniesienie</option>
+                                            <option value="rotate">Obrót</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-6">
+                                        <input type="checkbox" id="input-snow-effect"
+                                            class="w-4 h-4 rounded bg-white/10 border-white/20 accent-amber-500">
+                                        <label for="input-snow-effect" class="text-sm text-secondary font-medium">Efekt Śniegu</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="tab-links" class="hidden space-y-8">
+                    <section>
+                        <h3 class="text-lg font-medium text-white mb-4">Dodaj Własny Link</h3>
+                        <div class="glass-card p-4 rounded-xl space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <input type="text" id="link-title"
+                                    class="form-input w-full px-3 py-2 rounded-lg text-sm"
+                                    placeholder="Tytuł (np. YouTube)">
+                                <input type="text" id="link-url" class="form-input w-full px-3 py-2 rounded-lg text-sm"
+                                    placeholder="URL (https://...)">
+                                <input type="text" id="link-icon" class="form-input w-full px-3 py-2 rounded-lg text-sm"
+                                    placeholder="URL Ikony (opcjonalne)">
+                            </div>
+                            <button id="btn-add-link"
+                                class="w-full py-2 rounded-lg bg-white text-black text-sm font-bold hover:bg-gray-200 transition-colors">Dodaj
+                                Link</button>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-lg font-medium text-white mb-4">Aktywne Linki</h3>
+                        <div id="link-list" class="space-y-3">
+                        </div>
+                    </section>
+                </div>
+
+                <div id="tab-shop" class="hidden space-y-8">
+                    <section>
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-medium text-white">Szablony Społeczności</h3>
+                            <div class="flex gap-2">
+                                <button id="btn-save-template"
+                                    class="px-3 py-1 rounded-lg bg-white text-black text-xs font-bold hover:bg-gray-200 transition-colors">Zapisz
+                                    Obecny jako Szablon</button>
+                            </div>
+                        </div>
+
+                        <div id="template-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                    </section>
+                </div>
+
+            </div>
+
+            <div class="hidden md:block w-1/2 bg-black relative overflow-hidden">
+                <div id="preview-container" class="preview-container">
+
+                    <div class="profile-content" id="preview-content" style="opacity: 1;">
+                        <h1 id="preview-username" class="username-display">rekin_boss</h1>
+                        <p id="preview-bio" class="bio-display" style="display: block;">rekin_boss, owner Nexus Hub,
+                            Młody Youtuber</p>
+
+                        <div class="rich-presence-card" id="preview-card">
+                            <div class="rp-avatar">
+                                <img id="preview-avatar-img" src="" alt="Avatar">
+                                <div class="rp-status-dot"></div>
+                            </div>
+                            <div class="rp-info">
+                                <h3>
+                                    <span id="preview-rp-username">rekin_boss</span>
+                                    <span class="rp-badge" id="preview-badge">BOSS</span>
+                                </h3>
+                                <div class="rp-details" id="preview-status">
+                                    Status Discord
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="preview-links" class="social-dock">
+                        </div>
+                    </div>
+
+                    <div class="corner-control bottom-left">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                            </path>
+                        </svg>
+                        <span>6767</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div id="notification-toast" class="notification-toast">
+            <span id="notification-icon"></span>
+            <span id="notification-message"></span>
+        </div>
+
+        <script src="/api-client.js"></script>
+        <script src="/main.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', async () => {
+                window.showNotification = (message, type = 'success') => {
+                    const toast = document.getElementById('notification-toast');
+                    const msgEl = document.getElementById('notification-message');
+                    const iconEl = document.getElementById('notification-icon');
+
+                    msgEl.textContent = message;
+                    toast.className = `notification-toast ${type} show`;
+
+                    if (type === 'success') {
+                        iconEl.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                    } else {
+                        iconEl.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+                    }
+
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 3000);
+                };
+
+                db.requireAuth();
+                const user = db.getCurrentUser();
+
+                // Dodatkowe zabezpieczenie - jeśli user jest null, przekieruj do logowania
+                if (!user) {
+                    window.location.href = '/login/';
+                    return;
+                }
+
+                let profile = await db.getProfile(user.id);
+
+                // Jeśli profil nie istnieje (np. stare konto), stwórz tymczasowy obiekt z danych użytkownika
+                if (!profile) {
+                    profile = {
+                        username: user.username,
+                        bio: 'Witaj na moim profilu!',
+                        slug: user.username.toLowerCase().replace(/\s+/g, '-'),
+                        opacity: 60,
+                        blur: 12,
+                        accentColor: '#ffffff',
+                        links: [],
+                        badges: []
+                    };
+                }
+
+                if (profile) {
+                    // Istniejący kod wypełniania formularza
+                    document.getElementById('input-username').value = profile.username || user.username;
+                    // ... reszta pól (pozostaw bez zmian, to tylko początek bloku if)
+
+                    document.getElementById('input-username').value = profile.username || user.username;
+                    document.getElementById('input-bio').value = profile.bio || '';
+                    document.getElementById('input-discord-id').value = profile.discord_id || '';
+                    document.getElementById('input-avatar').value = profile.avatar || '';
+                    document.getElementById('input-background').value = profile.background || '';
+
+                    if (profile.avatar) {
+                        document.getElementById('avatar-preview-small').src = profile.avatar;
+                    }
+
+                    document.getElementById('input-audio').value = profile.audio || '';
+                    document.getElementById('input-cursor').value = profile.custom_cursor || '';
+                    document.getElementById('input-opacity').value = profile.opacity || '60';
+                    document.getElementById('input-blur').value = profile.blur || '12';
+                    document.getElementById('input-bg-effect').value = profile.bg_effect || 'none';
+                    document.getElementById('input-username-effect').value = profile.username_effect || 'none';
+                    document.getElementById('input-accent-color').value = profile.accent_color || '#ffffff';
+
+                    // Premium Fields Population
+                    document.getElementById('input-font').value = profile.font_family || 'Inter';
+                    document.getElementById('input-card-tilt').checked = profile.card_tilt == 1;
+                    document.getElementById('input-card-glow').value = profile.card_glow_color || '#000000';
+                    document.getElementById('input-badge').value = profile.badge_text || '';
+                    
+                    // New decoration fields
+                    document.getElementById('input-layout').value = profile.layout || 'center';
+                    document.getElementById('input-transition').value = profile.transition || 'fade';
+                    document.getElementById('input-link-style').value = profile.link_style || 'minimal';
+                    document.getElementById('input-link-layout').value = profile.link_layout || 'vertical';
+                    document.getElementById('input-avatar-shape').value = profile.avatar_shape || 'circle';
+                    document.getElementById('input-avatar-border').value = profile.avatar_border || 'none';
+                    document.getElementById('input-card-bg').value = profile.card_bg || 'blur';
+                    document.getElementById('input-particles').checked = profile.particles == 1;
+                    
+                    // Additional premium fields
+                    if (document.getElementById('input-avatar-border-color')) {
+                        document.getElementById('input-avatar-border-color').value = profile.avatar_border_color || '#ffffff';
+                    }
+                    if (document.getElementById('input-avatar-size')) {
+                        document.getElementById('input-avatar-size').value = profile.avatar_size || 'medium';
+                    }
+                    if (document.getElementById('input-avatar-pulse')) {
+                        document.getElementById('input-avatar-pulse').checked = profile.avatar_pulse == 1;
+                    }
+                    if (document.getElementById('input-bio-effect')) {
+                        document.getElementById('input-bio-effect').value = profile.bio_effect || 'none';
+                    }
+                    if (document.getElementById('input-username-shadow')) {
+                        document.getElementById('input-username-shadow').value = profile.username_shadow || 'none';
+                    }
+
+                    // Premium Lock Logic
+                    const isPremium = profile.is_premium == 1 || user.is_premium === 1 || user.is_premium === true || user.is_premium === '1';
+                    if (!isPremium) {
+                        const pContainer = document.getElementById('premium-container');
+                        const pOverlay = document.getElementById('premium-overlay');
+                        if (pContainer) pContainer.classList.add('locked');
+                        if (pOverlay) pOverlay.style.display = 'flex';
+
+                        document.getElementById('input-font').disabled = true;
+                        document.getElementById('input-card-tilt').disabled = true;
+                        document.getElementById('input-card-glow').disabled = true;
+                        document.getElementById('input-badge').disabled = true;
+                    }
+
+                    const viewBtn = document.getElementById('view-page-btn');
+                    if (viewBtn) {
+                        const slug = profile.slug || profile.username || user.username;
+                        viewBtn.href = `${window.location.origin}/${slug}`;
+                    }
+
+                    document.querySelectorAll('input, textarea, select').forEach(input => {
+                        input.dispatchEvent(new Event('input'));
+                    });
+
+                    const updatePreview = () => {
+                        document.getElementById('preview-username').textContent = document.getElementById('input-username').value;
+                        document.getElementById('preview-rp-username').textContent = document.getElementById('input-username').value;
+                        document.getElementById('preview-bio').textContent = document.getElementById('input-bio').value;
+
+                        const avatarUrl = document.getElementById('input-avatar').value || 'https://via.placeholder.com/150';
+                        document.getElementById('preview-avatar-img').src = avatarUrl;
+
+                        const bgUrl = document.getElementById('input-background').value;
+                        if (bgUrl) {
+                            document.getElementById('preview-container').style.backgroundImage = `url('${bgUrl}')`;
+                        } else {
+                            document.getElementById('preview-container').style.backgroundImage = 'none';
+                        }
+
+                        const opacity = document.getElementById('input-opacity').value;
+                        const blur = document.getElementById('input-blur').value;
+                        const contentBox = document.getElementById('preview-content');
+
+                        const alpha = parseInt(opacity) / 100;
+                        contentBox.style.background = `rgba(0, 0, 0, ${alpha})`;
+                        contentBox.style.backdropFilter = `blur(${blur}px)`;
+
+                        const accent = document.getElementById('input-accent-color').value;
+                        document.getElementById('preview-card').style.borderColor = accent;
+
+                        // Background Effects
+                        const bgEffect = document.getElementById('input-bg-effect').value;
+                        const previewContainer = document.getElementById('preview-container');
+                        
+                        // Usuń istniejące efekty
+                        previewContainer.className = 'preview-container';
+                        
+                        if (bgEffect && bgEffect !== 'none') {
+                            previewContainer.classList.add('bg-effect-' + bgEffect);
+                        }
+
+                        // Layout
+                        const layout = document.getElementById('input-layout').value;
+                        if (layout === 'left') {
+                            contentBox.style.alignItems = 'flex-start';
+                            contentBox.style.textAlign = 'left';
+                        } else if (layout === 'right') {
+                            contentBox.style.alignItems = 'flex-end';
+                            contentBox.style.textAlign = 'right';
+                        } else {
+                            contentBox.style.alignItems = 'center';
+                            contentBox.style.textAlign = 'center';
+                        }
+
+                        // Transition Effect
+                        const transition = document.getElementById('input-transition').value;
+                        if (transition === 'slide') {
+                            contentBox.style.animation = 'slideIn 0.5s ease';
+                        } else if (transition === 'zoom') {
+                            contentBox.style.animation = 'zoomIn 0.5s ease';
+                        } else if (transition === 'bounce') {
+                            contentBox.style.animation = 'bounceIn 0.5s ease';
+                        } else if (transition === 'rotate') {
+                            contentBox.style.animation = 'rotateIn 0.5s ease';
+                        }
+
+                        // Premium Preview Updates
+                        const font = document.getElementById('input-font').value;
+                        document.getElementById('preview-container').style.fontFamily = font;
+                        const cardGlow = document.getElementById('input-card-glow').value;
+                        if (cardGlow && cardGlow !== '#000000') {
+                            document.getElementById('preview-card').style.boxShadow = `0 8px 32px rgba(0,0,0,0.3), 0 0 20px ${cardGlow}`;
+                        } else {
+                            document.getElementById('preview-card').style.boxShadow = '';
+                        }
+                        const tilt = document.getElementById('input-card-tilt').checked;
+                        if (tilt) {
+                            document.getElementById('preview-card').style.transform = "perspective(1000px) rotateX(5deg) rotateY(-5deg)";
+                        } else {
+                            document.getElementById('preview-card').style.transform = "none";
+                        }
+
+                        // Avatar Shape & Border
+                        const avatarShape = document.getElementById('input-avatar-shape').value;
+                        const avatarBorder = document.getElementById('input-avatar-border').value;
+                        const avatarImg = document.getElementById('preview-avatar-img');
+                        
+                        avatarImg.style.borderRadius = '';
+                        avatarImg.style.clipPath = '';
+                        
+                        if (avatarShape === 'square') {
+                            avatarImg.style.borderRadius = '0';
+                        } else if (avatarShape === 'rounded') {
+                            avatarImg.style.borderRadius = '12px';
+                        } else if (avatarShape === 'hexagon') {
+                            avatarImg.style.clipPath = 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
+                        } else if (avatarShape === 'diamond') {
+                            avatarImg.style.clipPath = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
+                        }
+                        
+                        if (avatarBorder === 'solid') {
+                            avatarImg.style.border = `3px solid ${accent}`;
+                        } else if (avatarBorder === 'gradient') {
+                            avatarImg.style.border = '3px solid transparent';
+                            avatarImg.style.backgroundImage = 'linear-gradient(white, white), linear-gradient(45deg, #f06, #4a9eff)';
+                            avatarImg.style.backgroundOrigin = 'border-box';
+                            avatarImg.style.backgroundClip = 'padding-box, border-box';
+                        } else if (avatarBorder === 'glow') {
+                            avatarImg.style.boxShadow = `0 0 20px ${accent}`;
+                        } else if (avatarBorder === 'animated') {
+                            avatarImg.style.animation = 'borderPulse 2s infinite';
+                            avatarImg.style.border = `3px solid ${accent}`;
+                        } else {
+                            avatarImg.style.border = '';
+                            avatarImg.style.boxShadow = '';
+                        }
+
+                        // Card Background Effect
+                        const cardBg = document.getElementById('input-card-bg').value;
+                        const previewCard = document.getElementById('preview-card');
+                        
+                        if (cardBg === 'glass') {
+                            previewCard.style.background = 'rgba(255, 255, 255, 0.05)';
+                            previewCard.style.backdropFilter = 'blur(10px)';
+                        } else if (cardBg === 'solid') {
+                            previewCard.style.background = 'rgba(0, 0, 0, 0.8)';
+                            previewCard.style.backdropFilter = 'none';
+                        } else if (cardBg === 'gradient') {
+                            previewCard.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))';
+                        } else if (cardBg === 'transparent') {
+                            previewCard.style.background = 'transparent';
+                            previewCard.style.backdropFilter = 'none';
+                        }
+
+                        // Badge Preview
+                        const badgeText = document.getElementById('input-badge').value;
+                        const badgeEl = document.getElementById('preview-badge');
+                        if (badgeText) {
+                            badgeEl.textContent = badgeText;
+                            badgeEl.style.display = 'inline-block';
+                        } else {
+                            badgeEl.style.display = 'none';
+                        }
+
+                        const effect = document.getElementById('input-username-effect').value;
+                        const usernameEl = document.getElementById('preview-username');
+
+                        usernameEl.style.textShadow = '';
+                        usernameEl.style.animation = '';
+                        usernameEl.style.backgroundImage = '';
+                        usernameEl.style.webkitBackgroundClip = '';
+                        usernameEl.style.color = 'white';
+
+                        if (effect === 'glow') {
+                            usernameEl.style.textShadow = `0 0 20px ${accent}`;
+                        } else if (effect === 'glitch') {
+                            usernameEl.style.animation = 'pulse 0.2s infinite';
+                        } else if (effect === 'rainbow') {
+                            usernameEl.style.backgroundImage = 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)';
+                            usernameEl.style.webkitBackgroundClip = 'text';
+                            usernameEl.style.color = 'transparent';
+                        } else if (effect === 'neon') {
+                            usernameEl.style.textShadow = `0 0 10px ${accent}, 0 0 20px ${accent}, 0 0 30px ${accent}`;
+                            usernameEl.style.color = accent;
+                        } else if (effect === 'fire') {
+                            usernameEl.style.backgroundImage = 'linear-gradient(to top, #ff0000, #ff7700, #ffdd00)';
+                            usernameEl.style.webkitBackgroundClip = 'text';
+                            usernameEl.style.color = 'transparent';
+                            usernameEl.style.animation = 'flicker 0.3s infinite';
+                        } else if (effect === 'wave') {
+                            usernameEl.style.animation = 'wave 2s ease-in-out infinite';
+                        } else if (effect === 'typewriter') {
+                            usernameEl.style.borderRight = '2px solid white';
+                            usernameEl.style.animation = 'typing 2s steps(20) infinite, blink 0.5s step-end infinite';
+                        }
+
+                        const discordId = document.getElementById('input-discord-id').value;
+                        const statusEl = document.getElementById('preview-status');
+                        if (discordId) {
+                            statusEl.textContent = "Status Discord (Live)";
+                            statusEl.style.color = "#22c55e";
+                        } else {
+                            statusEl.textContent = "Brak Statusu";
+                            statusEl.style.color = "#a1a1aa";
+                        }
+                    };
+
+                    ['input-username', 'input-bio', 'input-avatar', 'input-background', 'input-opacity', 'input-blur', 'input-accent-color', 'input-username-effect', 'input-discord-id', 'input-font', 'input-card-glow', 'input-card-tilt', 'input-badge', 'input-layout', 'input-transition', 'input-link-style', 'input-link-layout', 'input-avatar-shape', 'input-avatar-border', 'input-card-bg', 'input-particles', 'input-bg-effect'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            el.addEventListener('input', updatePreview);
+                        }
+                    });
+
+                    updatePreview();
+
+                    // Obsługa kliknięć na gotowe kolory akcentów
+                    document.querySelectorAll('.accent-color-preset').forEach(colorDiv => {
+                        colorDiv.addEventListener('click', function() {
+                            const color = this.getAttribute('data-color');
+                            document.getElementById('input-accent-color').value = color;
+                            document.getElementById('input-accent-color').dispatchEvent(new Event('input'));
+                        });
+                    });
+
+                    const copyBtn = document.getElementById('btn-copy-link');
+                    if (copyBtn) {
+                        copyBtn.addEventListener('click', () => {
+                            const slug = profile.slug || profile.username || user.username;
+                            const url = `${window.location.origin}/${slug}`;
+                            navigator.clipboard.writeText(url).then(() => {
+                                showNotification('Link do profilu skopiowany!', 'success');
+                            });
+                        });
+                    }
+
+                    const handleFileUpload = (fileInputId, textInputId) => {
+                        const fileInput = document.getElementById(fileInputId);
+                        const textInput = document.getElementById(textInputId);
+
+                        if (fileInput && textInput) {
+                            fileInput.addEventListener('change', async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    try {
+                                        const result = await db.saveFile(file);
+                                        if (result && result.url) {
+                                            textInput.value = result.url;
+                                            textInput.dispatchEvent(new Event('input'));
+
+                                            if (fileInputId === 'file-avatar') {
+                                                const smallPreview = document.getElementById('avatar-preview-small');
+                                                if (smallPreview) smallPreview.src = result.url;
+                                            }
+                                        } else {
+                                            alert("Błąd przesyłania pliku.");
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        alert("Wystąpił błąd podczas wysyłania pliku.");
+                                    }
+                                }
+                            });
+                        }
+                    };
+
+                    handleFileUpload('file-background', 'input-background');
+                    handleFileUpload('file-avatar', 'input-avatar');
+                    handleFileUpload('file-cursor', 'input-cursor');
+
+                    if (profile.badges && profile.badges.length) {
+                        const badgeList = document.getElementById('badge-list');
+                        badgeList.innerHTML = '';
+                        profile.badges.forEach(badge => {
+                            const newBadgeHTML = `
+                            <div class="flex items-center justify-between p-2 rounded bg-white/5 border border-white/5 group">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">${badge.emoji}</span>
+                                    <span class="text-sm">${badge.text}</span>
+                                </div>
+                                <button class="text-secondary hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onclick="this.parentElement.remove(); updatePreviewBadges();">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
+                        `;
+                            badgeList.insertAdjacentHTML('beforeend', newBadgeHTML);
+                        });
+                        if (window.updatePreviewBadges) window.updatePreviewBadges();
+                    }
+
+                    if (profile.links && profile.links.length) {
+                        const linkList = document.getElementById('link-list');
+                        const previewLinks = document.getElementById('preview-links');
+                        linkList.innerHTML = '';
+                        previewLinks.innerHTML = '';
+
+                        profile.links.forEach(link => {
+                            let iconDisplay = '';
+                            let svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>';
+
+                            if (link.title.toLowerCase().includes('youtube')) {
+                                svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>';
+                            } else if (link.title.toLowerCase().includes('discord')) {
+                                svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>';
+                            }
+
+                            if (link.icon) {
+                                iconDisplay = `<img src="${link.icon}" class="w-8 h-8 rounded-lg object-cover bg-white/5">`;
+                            } else {
+                                iconDisplay = `<div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-secondary">${svgIcon}</div>`;
+                            }
+
+                            const newLinkHTML = `
+                            <div class="glass-card p-3 rounded-xl flex items-center justify-between group" data-url="${link.url}">
+                                <div class="flex items-center gap-3">
+                                    ${iconDisplay}
+                                    <div>
+                                        <div class="text-sm font-medium text-white">${link.title}</div>
+                                        <div class="text-xs text-secondary truncate max-w-[150px]">${link.url}</div>
+                                    </div>
+                                </div>
+                                <button class="text-secondary hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onclick="this.closest('.glass-card').remove(); updatePreviewLinks();">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
+                        `;
+                            linkList.insertAdjacentHTML('beforeend', newLinkHTML);
+
+                            const previewLinkHTML = `
+                            <a href="${link.url}" target="_blank" class="social-icon" title="${link.title}">
+                                ${svgIcon}
+                            </a>
+                        `;
+                            previewLinks.insertAdjacentHTML('beforeend', previewLinkHTML);
+                        });
+                        if (window.updatePreviewLinks) window.updatePreviewLinks();
+                    }
+                }
+
+                window.enterProfile = () => {
+                    const overlay = document.getElementById('click-overlay');
+                    const content = document.getElementById('profile-content');
+
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        content.style.opacity = '1';
+                    }, 500);
+
+                    console.log("Playing audio...");
+                };
+
+                window.toggleMute = () => {
+                    console.log("Toggling mute...");
+                };
+
+                const sidebarName = document.querySelector('.sidebar .text-sm.font-medium');
+                const sidebarEmail = document.querySelector('.sidebar .text-xs.text-secondary');
+                const sidebarAvatar = document.querySelector('.sidebar img');
+
+                if (sidebarName) sidebarName.textContent = user.username;
+                if (sidebarEmail) sidebarEmail.textContent = user.email;
+                if (sidebarAvatar && profile && (user.avatar || profile.avatar)) {
+                    sidebarAvatar.src = user.avatar || profile.avatar;
+                }
+
+                const btnAddLink = document.getElementById('btn-add-link');
+                if (btnAddLink) {
+                    btnAddLink.addEventListener('click', () => {
+                        const titleInput = document.getElementById('link-title');
+                        const urlInput = document.getElementById('link-url');
+                        const iconInput = document.getElementById('link-icon');
+
+                        const title = titleInput.value.trim();
+                        const url = urlInput.value.trim();
+                        const icon = iconInput.value.trim();
+
+                        if (!title || !url) {
+                            alert('Please enter both Title and URL');
+                            return;
+                        }
+
+                        const linkList = document.getElementById('link-list');
+                        let iconDisplay = '';
+                        let svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>';
+
+                        if (title.toLowerCase().includes('youtube')) {
+                            svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>';
+                        } else if (title.toLowerCase().includes('discord')) {
+                            svgIcon = '<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>';
+                        }
+
+                        if (icon) {
+                            iconDisplay = `<img src="${icon}" class="w-8 h-8 rounded-lg object-cover bg-white/5">`;
+                        } else {
+                            iconDisplay = `<div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-secondary">${svgIcon}</div>`;
+                        }
+
+                        const newLinkHTML = `
+                                <div class="glass-card p-3 rounded-xl flex items-center justify-between group" data-url="${url}">
+                                    <div class="flex items-center gap-3">
+                                        ${iconDisplay}
+                                        <div>
+                                            <div class="font-medium text-white">${title}</div>
+                                            <div class="text-xs text-secondary truncate max-w-[150px]">${url}</div>
+                                        </div>
+                                    </div>
+                                    <button class="text-secondary hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onclick="this.closest('.glass-card').remove();">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+                                </div>
+                            `;
+                        linkList.insertAdjacentHTML('beforeend', newLinkHTML);
+
+                        titleInput.value = '';
+                        urlInput.value = '';
+                        iconInput.value = '';
+                    });
+                }
+
+                const saveBtn = document.getElementById('btn-save-changes');
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', async () => {
+                        const badges = [];
+                        document.querySelectorAll('#badge-list > div').forEach(el => {
+                            const emojiEl = el.querySelector('.text-lg');
+                            const textEl = el.querySelector('.text-sm');
+                            if (emojiEl && textEl) {
+                                badges.push({
+                                    emoji: emojiEl.textContent,
+                                    text: textEl.textContent
+                                });
+                            }
+                        });
+
+                        const links = [];
+                        document.querySelectorAll('#link-list > div').forEach(el => {
+                            const titleEl = el.querySelector('.font-medium');
+                            if (titleEl) {
+                                const title = titleEl.textContent;
+                                const url = el.dataset.url;
+                                const iconImg = el.querySelector('img');
+                                const icon = iconImg ? iconImg.src : '';
+                                links.push({ title, url, icon });
+                            }
+                        });
+
+                        const profileData = {
+                            username: document.getElementById('input-username').value,
+                            bio: document.getElementById('input-bio').value,
+                            discordId: document.getElementById('input-discord-id').value,
+                            avatar: document.getElementById('input-avatar').value,
+                            background: document.getElementById('input-background').value,
+                            audio: document.getElementById('input-audio').value,
+                            cursor: document.getElementById('input-cursor').value,
+                            opacity: document.getElementById('input-opacity').value,
+                            blur: document.getElementById('input-blur').value,
+                            bgEffect: document.getElementById('input-bg-effect').value,
+                            usernameEffect: document.getElementById('input-username-effect').value,
+                            accentColor: document.getElementById('input-accent-color').value,
+                            fontFamily: document.getElementById('input-font').value,
+                            cardTilt: document.getElementById('input-card-tilt').checked ? 1 : 0,
+                            cardGlowColor: document.getElementById('input-card-glow').value,
+                            badgeText: document.getElementById('input-badge').value,
+                            layout: document.getElementById('input-layout').value,
+                            transition: document.getElementById('input-transition').value,
+                            linkStyle: document.getElementById('input-link-style').value,
+                            linkLayout: document.getElementById('input-link-layout').value,
+                            avatarShape: document.getElementById('input-avatar-shape').value,
+                            avatarBorder: document.getElementById('input-avatar-border').value,
+                            avatarBorderColor: document.getElementById('input-avatar-border-color')?.value || '#ffffff',
+                            avatarSize: document.getElementById('input-avatar-size')?.value || 'medium',
+                            avatarPulse: document.getElementById('input-avatar-pulse')?.checked ? 1 : 0,
+                            bioEffect: document.getElementById('input-bio-effect')?.value || 'none',
+                            usernameShadow: document.getElementById('input-username-shadow')?.value || 'none',
+                            cardBg: document.getElementById('input-card-bg').value,
+                            particles: document.getElementById('input-particles').checked ? 1 : 0,
+                            badges,
+                            links
+                        };
+
+                        const res = await db.saveProfile(user.id, profileData);
+                        if (res.success) {
+                            showNotification('Zmiany zapisane!', 'success');
+                        } else {
+                            showNotification('Błąd zapisu: ' + (res.message || 'Nieznany błąd'), 'error');
+                        }
+                    });
+                }
+                const btnSaveTemplate = document.getElementById('btn-save-template');
+                const templateList = document.getElementById('template-list');
+
+                async function loadTemplates() {
+                    try {
+                        const templates = await db.getCommunityTemplates();
+                        const currentUser = db.getCurrentUser();
+                        const isAdmin = currentUser && currentUser.is_admin === 1;
+                        templateList.innerHTML = '';
+
+                        if (templates.length === 0) {
+                            templateList.innerHTML = '<p class="text-secondary col-span-full text-center py-8">Brak szablonów. Bądź pierwszym który stworzy szablon!</p>';
+                            return;
+                        }
+
+                        templates.forEach(t => {
+                            const isOwner = currentUser && t.author === currentUser.username;
+                            const canDelete = isOwner || isAdmin;
+                            const deleteButton = canDelete ? `<button class="mt-2 py-2 px-3 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white text-xs font-bold transition-all" onclick='deleteTemplate(${t.id})' title="Usuń szablon"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>` : '';
+                            const templateHTML = `
+                            <div class="glass-card rounded-xl overflow-hidden group cursor-pointer">
+                                <div class="h-32 bg-cover bg-center relative" style="background-image: url('${t.background || 'https://via.placeholder.com/300'}')">
+                                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h4 class="font-medium text-white">${t.name || 'Bez nazwy'}</h4>
+                                            <p class="text-xs text-secondary">by ${t.author}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button class="flex-1 mt-2 py-2 rounded-lg bg-white/5 hover:bg-white text-white hover:text-black text-xs font-bold transition-all" onclick='applyTemplate(${JSON.stringify(t)})'>Zastosuj Szablon</button>
+                                        ${deleteButton}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                            templateList.insertAdjacentHTML('beforeend', templateHTML);
+                        });
+                    } catch (err) {
+                        console.error('Błąd ładowania szablonów:', err);
+                        templateList.innerHTML = '<p class="text-secondary col-span-full text-center py-8">Błąd ładowania szablonów</p>';
+                    }
+                }
+
+                window.applyTemplate = (template) => {
+                    if (confirm('Apply this template? This will overwrite your current settings.')) {
+                        document.getElementById('input-bio').value = template.bio || '';
+                        document.getElementById('input-avatar').value = template.avatar || '';
+                        document.getElementById('input-background').value = template.background || '';
+
+                        document.querySelectorAll('input, textarea').forEach(input => input.dispatchEvent(new Event('input')));
+
+                        const badgeList = document.getElementById('badge-list');
+                        badgeList.innerHTML = '';
+                        if (template.badges) {
+                            template.badges.forEach(b => {
+                                const html = `
+                                <div class="flex items-center justify-between p-2 rounded bg-white/5 border border-white/5 group">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg">${b.emoji}</span>
+                                        <span class="text-sm">${b.text}</span>
+                                    </div>
+                                    <button class="text-secondary hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" onclick="this.parentElement.remove(); updatePreviewBadges();">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+                                </div>
+                            `;
+                                badgeList.insertAdjacentHTML('beforeend', html);
+                            });
+                            updatePreviewBadges();
+                        }
+
+                        const linkList = document.getElementById('link-list');
+                        linkList.innerHTML = '';
+                        if (template.links) {
+                            template.links.forEach(l => {
+                            });
+                            showNotification('Szablon zaaplikowany! Zapisz zmiany.', 'success');
+                        }
+                    }
+                };
+
+                window.deleteTemplate = async (templateId) => {
+                    if (confirm('Na pewno chcesz usunąć ten szablon?')) {
+                        const result = await db.deleteTemplate(templateId);
+                        if (result.success) {
+                            showNotification('Szablon usunięty!', 'success');
+                            await loadTemplates();
+                        } else {
+                            showNotification('Błąd: ' + (result.message || 'Nie udało się usunąć szablonu'), 'error');
+                        }
+                    }
+                };
+
+                if (btnSaveTemplate) {
+                    btnSaveTemplate.addEventListener('click', async () => {
+                        const name = prompt('Podaj nazwę dla swojego szablonu:');
+                        if (!name) return;
+
+                        const badges = [];
+                        document.querySelectorAll('#badge-list > div').forEach(el => {
+                            badges.push({
+                                emoji: el.querySelector('.text-lg').textContent,
+                                text: el.querySelector('.text-sm').textContent
+                            });
+                        });
+
+                        const links = [];
+                        document.querySelectorAll('#link-list > div').forEach(el => {
+                            links.push({
+                                title: el.querySelector('.font-medium').textContent,
+                                url: el.dataset.url,
+                                icon: el.querySelector('img') ? el.querySelector('img').src : ''
+                            });
+                        });
+
+                        const templateData = {
+                            name,
+                            bio: document.getElementById('input-bio').value,
+                            avatar: document.getElementById('input-avatar').value,
+                            background: document.getElementById('input-background').value,
+                            badges,
+                            links
+                        };
+
+                        const result = await db.saveTemplate(templateData);
+                        if (result.success) {
+                            showNotification('Szablon zapisany w społeczności!', 'success');
+                            await loadTemplates();
+                        } else {
+                            showNotification('Błąd: ' + (result.message || 'Nie udało się zapisać szablonu'), 'error');
+                        }
+                    });
+                }
+
+                loadTemplates();
+            });
+        </script>
+</body>
+
+</html>

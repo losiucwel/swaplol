@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konfiguracja Profilu - Panel</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'surface-hover': '#121212',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'primary': '#FFFFFF',
+                        'secondary': '#A1A1AA',
+                        'accent': '#FFFFFF',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: #FFFFFF;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            outline: none;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: #FFFFFF;
+            color: #000000;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: #E5E5E5;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div class="glass-card w-full max-w-md rounded-2xl p-8 relative z-10 animate-fade-in">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-display font-bold mb-2">Skonfiguruj Profil</h1>
+            <p class="text-secondary">Jeszcze tylko kilka kroków.</p>
+        </div>
+
+        <form id="setup-form" class="space-y-6">
+            <div>
+                <label for="setup-slug" class="block text-sm font-medium text-secondary mb-2">Unikalny adres URL</label>
+                <div class="flex items-center">
+                    <span class="text-secondary text-sm mr-2">/u/</span>
+                    <input type="text" id="setup-slug" class="form-input w-full px-4 py-3 rounded-lg text-sm"
+                        placeholder="twoja-nazwa" required>
+                </div>
+                <p class="text-xs text-secondary mt-1">To będzie adres Twojej strony.</p>
+            </div>
+
+            <div>
+                <label for="setup-bio" class="block text-sm font-medium text-secondary mb-2">Krótki opis (Bio)</label>
+                <textarea id="setup-bio" class="form-input w-full px-4 py-3 rounded-lg text-sm h-24 resize-none"
+                    placeholder="Napisz coś o sobie..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary w-full py-3 rounded-lg text-sm mt-2">
+                Zakończ konfigurację
+            </button>
+        </form>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            db.requireAuth();
+            const user = db.getCurrentUser();
+
+            if (user && user.username) {
+                document.getElementById('setup-slug').value = user.username.toLowerCase().replace(/\s+/g, '-');
+            }
+
+            document.getElementById('setup-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const slug = document.getElementById('setup-slug').value.trim();
+                const bio = document.getElementById('setup-bio').value.trim();
+
+                if (!slug) {
+                    alert('Proszę podać unikalny adres URL.');
+                    return;
+                }
+
+                const existingProfile = await db.getProfileBySlug(slug);
+                if (existingProfile && String(existingProfile.user_id) !== String(user.id)) {
+                    alert('Ten adres URL jest już zajęty.');
+                    return;
+                }
+
+                const profileData = {
+                    slug: slug,
+                    bio: bio,
+                    username: user.username,
+                    avatar: user.avatar || 'logo.png'
+                };
+
+                const saveRes = await db.saveProfile(user.id, profileData);
+                if (saveRes.success) {
+                    window.location.href = '/dashboard/';
+                } else {
+                    alert('Błąd zapisu: ' + (saveRes.message || 'Nieznany błąd'));
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

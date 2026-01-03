@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administracyjny - swap.lol</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script src="api-client.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#050505',
+                        'surface': '#0A0A0A',
+                        'border': 'rgba(255, 255, 255, 0.08)',
+                        'secondary': '#A1A1AA',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-premium {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .badge-admin {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+        }
+
+        .badge-user {
+            background: rgba(255, 255, 255, 0.1);
+            color: #A1A1AA;
+        }
+    </style>
+</head>
+
+<body class="p-6">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-display font-bold">Panel Administracyjny</h1>
+                    <p class="text-secondary mt-1">Zarządzaj użytkownikami i systemem</p>
+                </div>
+                <a href="/dashboard/"
+                    class="px-4 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+                    Wróć do Dashboardu
+                </a>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card p-6 rounded-xl">
+                <div class="text-secondary text-sm mb-1">Wszyscy Użytkownicy</div>
+                <div class="text-3xl font-bold" id="total-users">0</div>
+            </div>
+            <div class="glass-card p-6 rounded-xl">
+                <div class="text-secondary text-sm mb-1">Premium</div>
+                <div class="text-3xl font-bold text-yellow-500" id="premium-users">0</div>
+            </div>
+            <div class="glass-card p-6 rounded-xl">
+                <div class="text-secondary text-sm mb-1">Administratorzy</div>
+                <div class="text-3xl font-bold text-red-500" id="admin-users">0</div>
+            </div>
+            <div class="glass-card p-6 rounded-xl">
+                <div class="text-secondary text-sm mb-1">Całkowite Wyświetlenia</div>
+                <div class="text-3xl font-bold" id="total-views">0</div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="glass-card rounded-xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-display font-bold">Zarządzanie Użytkownikami</h2>
+                <input type="text" id="search-users" placeholder="Szukaj użytkownika..."
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm w-64 focus:outline-none focus:border-white/20">
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/10">
+                            <th class="text-left py-3 px-4 text-sm font-medium text-secondary">ID</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium text-secondary">Użytkownik</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium text-secondary">Email</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium text-secondary">Status</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium text-secondary">Wyświetlenia</th>
+                            <th class="text-right py-3 px-4 text-sm font-medium text-secondary">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <!-- Rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is admin
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                db.requireAuth();
+                const user = db.getCurrentUser();
+
+                // Check admin status from API
+                const adminCheck = await fetch(`${db.apiUrl}/admin/check`, {
+                    headers: { 'Authorization': `Bearer ${db.getToken()}` }
+                });
+                const adminData = await adminCheck.json();
+                
+                if (!adminData.isAdmin) {
+                    alert('Brak dostępu do panelu administracyjnego');
+                    window.location.href = '/dashboard/';
+                    return;
+                }
+
+                await loadUsers();
+                setupSearch();
+            } catch (e) {
+                console.error('Error:', e);
+                window.location.href = 'login/';
+            }
+        });
+
+        let allUsers = [];
+
+        async function loadUsers() {
+            try {
+                // Fetch all users from API
+                const res = await fetch(`${db.apiUrl}/admin/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${db.getToken()}`
+                    }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    allUsers = data.users || [];
+                    
+                    // Map database fields to expected format
+                    allUsers = allUsers.map(user => ({
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        isPremium: user.is_premium == 1,
+                        isAdmin: user.is_admin == 1,
+                        views: user.views || 0
+                    }));
+                } else {
+                    console.error('Failed to load users:', res.status);
+                    allUsers = [];
+                }
+
+                renderUsers(allUsers);
+                updateStats();
+            } catch (err) {
+                console.error('Error loading users:', err);
+                allUsers = [];
+                renderUsers(allUsers);
+                updateStats();
+            }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-white/5 hover:bg-white/5 transition';
+
+                const statusBadge = user.isAdmin
+                    ? '<span class="badge badge-admin">ADMIN</span>'
+                    : user.isPremium
+                        ? '<span class="badge badge-premium">PREMIUM</span>'
+                        : '<span class="badge badge-user">UŻYTKOWNIK</span>';
+
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-sm">#${user.id}</td>
+                    <td class="py-3 px-4 text-sm font-medium">${user.username}</td>
+                    <td class="py-3 px-4 text-sm text-secondary">${user.email}</td>
+                    <td class="py-3 px-4">${statusBadge}</td>
+                    <td class="py-3 px-4 text-sm">${user.views || 0}</td>
+                    <td class="py-3 px-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            ${!user.isPremium ? `
+                                <button onclick="togglePremium(${user.id}, true)" 
+                                    class="px-3 py-1 bg-yellow-500 text-black rounded text-xs font-medium hover:bg-yellow-400 transition">
+                                    Nadaj Premium
+                                </button>
+                            ` : `
+                                <button onclick="togglePremium(${user.id}, false)" 
+                                    class="px-3 py-1 bg-white/10 text-white rounded text-xs font-medium hover:bg-white/20 transition">
+                                    Zabierz Premium
+                                </button>
+                            `}
+                            ${!user.isAdmin ? `
+                                <button onclick="toggleAdmin(${user.id}, true)" 
+                                    class="px-3 py-1 bg-red-500 text-white rounded text-xs font-medium hover:bg-red-400 transition">
+                                    Nadaj Admin
+                                </button>
+                            ` : `
+                                <button onclick="toggleAdmin(${user.id}, false)" 
+                                    class="px-3 py-1 bg-white/10 text-white rounded text-xs font-medium hover:bg-white/20 transition">
+                                    Zabierz Admin
+                                </button>
+                            `}
+                            <button onclick="deleteUser(${user.id})" 
+                                class="px-3 py-1 bg-red-500/20 text-red-500 rounded text-xs font-medium hover:bg-red-500/30 transition">
+                                Usuń
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('total-users').textContent = allUsers.length;
+            document.getElementById('premium-users').textContent = allUsers.filter(u => u.isPremium).length;
+            document.getElementById('admin-users').textContent = allUsers.filter(u => u.isAdmin).length;
+            document.getElementById('total-views').textContent = allUsers.reduce((sum, u) => sum + (u.views || 0), 0);
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('search-users');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const filtered = allUsers.filter(user =>
+                    user.username.toLowerCase().includes(query) ||
+                    user.email.toLowerCase().includes(query)
+                );
+                renderUsers(filtered);
+            });
+        }
+
+        async function togglePremium(userId, grant) {
+            if (!confirm(`Czy na pewno chcesz ${grant ? 'nadać' : 'zabrać'} premium użytkownikowi?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`${db.apiUrl}/admin/users/${userId}/premium`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${db.getToken()}`
+                    },
+                    body: JSON.stringify({ premium: grant })
+                });
+
+                if (res.ok) {
+                    const user = allUsers.find(u => u.id === userId);
+                    if (user) user.isPremium = grant;
+                    renderUsers(allUsers);
+                    updateStats();
+                    alert(`Premium ${grant ? 'nadane' : 'zabrane'} pomyślnie`);
+                } else {
+                    const error = await res.json();
+                    alert('Błąd: ' + (error.message || 'Nie udało się zaktualizować statusu'));
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Błąd połączenia z serwerem');
+            }
+        }
+
+        async function toggleAdmin(userId, grant) {
+            if (!confirm(`Czy na pewno chcesz ${grant ? 'nadać' : 'zabrać'} uprawnienia administratora?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`${db.apiUrl}/admin/users/${userId}/admin`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${db.getToken()}`
+                    },
+                    body: JSON.stringify({ admin: grant })
+                });
+
+                if (res.ok) {
+                    const user = allUsers.find(u => u.id === userId);
+                    if (user) user.isAdmin = grant;
+                    renderUsers(allUsers);
+                    updateStats();
+                    alert(`Status admina ${grant ? 'nadany' : 'zabrany'} pomyślnie`);
+                } else {
+                    const error = await res.json();
+                    alert('Błąd: ' + (error.message || 'Nie udało się zaktualizować statusu'));
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Błąd połączenia z serwerem');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Czy na pewno chcesz usunąć tego użytkownika? Ta operacja jest nieodwracalna!')) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`${db.apiUrl}/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${db.getToken()}`
+                    }
+                });
+
+                if (res.ok) {
+                    allUsers = allUsers.filter(u => u.id !== userId);
+                    renderUsers(allUsers);
+                    updateStats();
+                    alert('Użytkownik usunięty pomyślnie');
+                } else {
+                    const error = await res.json();
+                    alert('Błąd: ' + (error.message || 'Nie udało się usunąć użytkownika'));
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Błąd połączenia z serwerem');
+            }
+        }
+    </script>
+</body>
+
+</html>
